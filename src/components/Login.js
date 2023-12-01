@@ -1,95 +1,101 @@
-export default function Login() {
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const data = new FormData(event.target);
+import React, { useState } from "react";
+import Axios from "axios"; // Importuj Axios
+import background from "../images/background.png"; 
 
-    const response = await fetch('http://localhost:5000/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          first_name: data.get('first_name'),
-            password: data.get('password'),
-        }),
-    });
+const Login = () => {
+  const [loginOrEmail, setLoginOrEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    const result = await response.json();
-    console.log(result);
-};
-    return (
-      <>
-        {/*
-          This example requires updating your template:
+  const handleLoginOrEmailChange = (e) => {
+    setLoginOrEmail(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+        const response = await Axios.post("http://localhost:5000/users/login", {  
+        username: loginOrEmail,
+        password: password,
+      });
   
-          ```
-          <html class="h-full bg-white">
-          <body class="h-full">
-          ```
-        */}
-        <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-          <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-            <img
-              className="mx-auto h-10 w-auto"
-              src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-              alt="Your Company"
+      if (response.status === 200) {
+        // Tutaj możesz obsłużyć poprawne logowanie
+        console.log("Zalogowano pomyślnie");
+      }
+    } catch (error) {
+      // Tutaj możesz obsłużyć błąd logowania
+      console.error("Błąd logowania:", error.response.data.message);
+    }
+  };
+
+  return (
+    <div
+      className="min-h-screen bg-cover flex items-center justify-center"
+      style={{
+        backgroundImage: `url(${background})`,
+      }}
+    >
+      <div className="w-full max-w-md">
+        <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+          <h1 className="text-xl font-semibold text-gray-800 text-center mb-4">
+            Logowanie do systemu
+          </h1>
+          <hr className="mb-4" />
+          <div className="mb-4">
+            <label
+              htmlFor="loginOrEmail"
+              className="block text-gray-700 text-sm font-bold mb-2"
+            >
+              Login/adres email:
+            </label>
+            <input
+              type="text"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="loginOrEmail"
+              value={loginOrEmail}
+              onChange={handleLoginOrEmailChange}
+              name="loginOrEmail"
             />
-            <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-              Logowanie do systemu
-            </h2>
+            {/* Tutaj możesz dodać wyświetlanie błędu */}
           </div>
-  
-          <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form className="space-y-6" method="POST" onSubmit={handleSubmit}>
-              <div>
-                <label htmlFor="first_name" className="text-left block text-sm font-medium leading-6 text-gray-900">
-                  Login/Adres email
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="first_name"
-                    name="first_name"
-                    type="first_name"
-                    required
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-  
-              <div>
-                <div className="flex items-center justify-between">
-                  <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
-                    Hasło
-                  </label>
-                  <div className="text-sm">
-                    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                      Zapomniałeś/aś hasła?
-                    </a>
-                  </div>
-                </div>
-                <div className="mt-2">
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-  
-              <div>
-                <button
-                  type="submit"
-                  className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
-                  Zaloguj się
-                </button>
-              </div>
-            </form>
+          <div className="mb-6">
+            <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
+              Hasło:
+            </label>
+            <div className="relative">
+              <input
+                type="password"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="password"
+                value={password}
+                onChange={handlePasswordChange}
+                name="password"
+              />
+              <button type="button" className="absolute right-0 top-0 mt-2 mr-2">
+                <i className="bi bi-eye-fill"></i>
+              </button>
+            </div>
+            {/* Tutaj możesz dodać wyświetlanie błędu */}
           </div>
-        </div>
-      </>
-    )
-}
+          <div className="mb-6 text-center">
+            <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 w-full rounded-full">
+              Zaloguj <i className="bi bi-arrow-right ml-2"></i>
+            </button>
+          </div>
+          <hr className="mb-6" />
+          <div className="text-center">
+            <a className="text-gray-700" href="/forgot-password-request">
+              Zapomniałem/am hasła
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
