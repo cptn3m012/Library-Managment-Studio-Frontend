@@ -40,7 +40,7 @@
                 <div className='flex items-center'>
                     <HiOutlineMenu className="text-3xl cursor-pointer" onClick={toggleSidebar} />
                 </div>
-                <div className='flex items-center'>
+                <div className='flex items-center mr-5'>
                     <button onClick={toggleDarkMode} className="mr-4">
                         {isDarkMode ? <HiSun className="text-xl" /> : <HiMoon className="text-xl" />}
                     </button>
@@ -64,25 +64,23 @@
                     {/* Dropdown menu */}
                     <div 
                         id="dropdownAvatarName" 
-                        className={`absolute z-10 ${isDropdownOpen ? 'block' : 'hidden'} bg-white rounded-lg shadow w-44`} style={{ top: '100%', left: '0' }}>
-                        {/* Reszta Twojego kodu HTML */}
+                        className={`absolute z-10 ${isDropdownOpen ? 'block' : 'hidden'} ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-700'} rounded-lg shadow w-44`} 
+                        style={{ top: '100%', left: '0' }}
+                        >
                         <div className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                            <div className="font-medium ">Pro User</div>
-                            <div className="truncate">name@flowbite.com</div>
+                            <div className={`${isDarkMode ? 'text-white' : 'text-gray-900'} font-medium`}>Admin</div>
+                            <div className={`${isDarkMode ? 'text-white' : 'text-gray-900'} truncate`}>mail@gmail.com</div>
                         </div>
                         <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownAvatarNameButton">
-                            <li>
-                                <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dashboard</a>
+                        <li>
+                                <a href="#" className={`${isDarkMode ? 'text-white' : 'text-black'} hover:bg-gray-100 dark:hover:bg-gray-600 block px-4 py-2`}>Dashboard</a>
                             </li>
                             <li>
-                                <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</a>
-                            </li>
-                            <li>
-                                <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Earnings</a>
+                                <a href="#" className={`${isDarkMode ? 'text-white' : 'text-black'} hover:bg-gray-100 dark:hover:bg-gray-600 block px-4 py-2`}>Ustawienia</a>
                             </li>
                         </ul>
                         <div className="py-2">
-                            <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign out</a>
+                            <a href="#" className={`${isDarkMode ? 'text-white' : 'text-black'} hover:bg-gray-100 dark:hover:bg-gray-600 block px-4 py-2`}>Wyloguj się</a>
                         </div>
                     </div>
                 </div>
