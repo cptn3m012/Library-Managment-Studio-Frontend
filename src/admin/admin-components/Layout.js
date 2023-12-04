@@ -10,12 +10,12 @@ function Layout() {
         setIsSidebarOpen(!isSidebarOpen);
     }
 
-    return(
+    return (
         <div className='flex flex-row bg-neutral-500 h-screen w-screen overflow-hidden'>
             {isSidebarOpen && <Sidebar />}
             <div className='flex flex-col flex-1'>
                 <Header toggleSidebar={toggleSidebar} />
-                <div className='p-4'>
+                <div className='overflow-y-auto flex-1 p-4'>
                     {<Outlet />}
                 </div>
             </div>

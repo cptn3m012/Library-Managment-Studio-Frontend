@@ -1,53 +1,47 @@
-    import React, { useState, useEffect, useRef } from 'react';
-    import { HiOutlineMenu, HiUser, HiMoon, HiSun } from "react-icons/hi";
+import React, { useState, useEffect, useRef } from 'react';
+import { HiOutlineMenu, HiUser } from "react-icons/hi";
+import DarkModeToggle from './DarkModeToggle';
 
-    function Header({ toggleSidebar }) {
-        const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-        const [isButtonFocused, setIsButtonFocused] = useState(false);
-        const [isDarkMode, setIsDarkMode] = useState(false);
-        const dropdownRef = useRef(null);
+function Header({ toggleSidebar }) {
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isButtonFocused, setIsButtonFocused] = useState(false);
+    const dropdownRef = useRef(null);
 
-        const toggleDropdown = () => {
-            setIsDropdownOpen(!isDropdownOpen);
+    const toggleDropdown = () => {
+        setIsDropdownOpen(!isDropdownOpen);
 
-            if (!isDropdownOpen) {
-                setIsButtonFocused(true);
-            } else {
-                setIsButtonFocused(false);
-            }
+        if (!isDropdownOpen) {
+            setIsButtonFocused(true);
+        } else {
+            setIsButtonFocused(false);
         }
+    }
 
-        const toggleDarkMode = () => {
-            setIsDarkMode(!isDarkMode);
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsDropdownOpen(false);
+                setIsButtonFocused(false); // Wyłącz focus, gdy kliknięto poza dropdown
+            }
         };
 
-        useEffect(() => {
-            const handleClickOutside = (event) => {
-                if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                    setIsDropdownOpen(false);
-                    setIsButtonFocused(false); // Wyłącz focus, gdy kliknięto poza dropdown
-                }
-            };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [dropdownRef]);
 
-            document.addEventListener("mousedown", handleClickOutside);
-            return () => {
-                document.removeEventListener("mousedown", handleClickOutside);
-            };
-        }, [dropdownRef]);
-
-        return (
-            <div className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'} h-16 px-4 flex justify-between items-center relative`}>
-                <div className='flex items-center'>
-                    <HiOutlineMenu className="text-3xl cursor-pointer" onClick={toggleSidebar} />
-                </div>
-                <div className='flex items-center mr-5'>
-                    <button onClick={toggleDarkMode} className="mr-4">
-                        {isDarkMode ? <HiSun className="text-xl" /> : <HiMoon className="text-xl" />}
-                    </button>
-                    <div ref={dropdownRef} className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} flex items-center relative`}>
-                    <button 
-                       className={`flex items-center text-sm font-medium rounded-full focus:outline-none ${isDarkMode ? 'text-white' : 'text-gray-900'}`} 
-                        type="button" 
+    return (
+        <div className='h-16 px-4 flex justify-between items-center relative bg-white text-gray-900 dark:bg-gray-800 dark:text-white'>
+            <div className='flex items-center'>
+                <HiOutlineMenu className="text-3xl cursor-pointer" onClick={toggleSidebar} />
+            </div>
+            <div className='flex items-center mr-5'>
+                <DarkModeToggle />
+                <div ref={dropdownRef} className='flex items-center relative'>
+                    <button
+                        className='flex items-center text-sm font-medium rounded-full focus:outline-none text-gray-900 dark:text-white'
+                        type="button"
                         onClick={toggleDropdown}
                         style={{
                             outline: isButtonFocused ? '2px solid lightgray' : 'none',
@@ -62,31 +56,31 @@
                     </button>
 
                     {/* Dropdown menu */}
-                    <div 
-                        id="dropdownAvatarName" 
-                        className={`absolute z-10 ${isDropdownOpen ? 'block' : 'hidden'} ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-700'} rounded-lg shadow w-44`} 
+                    <div
+                        id="dropdownAvatarName"
+                        className={`absolute z-10 ${isDropdownOpen ? 'block' : 'hidden'} rounded-lg shadow w-44 top-full left-0 bg-white text-gray-700 dark:text-white dark:bg-gray-700`}
                         style={{ top: '100%', left: '0' }}
-                        >
+                    >
                         <div className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                            <div className={`${isDarkMode ? 'text-white' : 'text-gray-900'} font-medium`}>Admin</div>
-                            <div className={`${isDarkMode ? 'text-white' : 'text-gray-900'} truncate`}>mail@gmail.com</div>
+                            <div className="font-medium">Admin</div>
+                            <div className="truncate">mail@gmail.com</div>
                         </div>
                         <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownAvatarNameButton">
-                        <li>
-                                <a href="#" className={`${isDarkMode ? 'text-white' : 'text-black'} hover:bg-gray-100 dark:hover:bg-gray-600 block px-4 py-2`}>Dashboard</a>
+                            <li>
+                                <a href="/login" className='block px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'>Dashboard</a>
                             </li>
                             <li>
-                                <a href="#" className={`${isDarkMode ? 'text-white' : 'text-black'} hover:bg-gray-100 dark:hover:bg-gray-600 block px-4 py-2`}>Ustawienia</a>
+                                <a href="/settings" className='block px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'>Ustawienia</a>
                             </li>
                         </ul>
                         <div className="py-2">
-                            <a href="#" className={`${isDarkMode ? 'text-white' : 'text-black'} hover:bg-gray-100 dark:hover:bg-gray-600 block px-4 py-2`}>Wyloguj się</a>
+                            <a href="/logout" className='block px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'>Wyloguj się</a>
                         </div>
                     </div>
                 </div>
-                </div>
             </div>
-        );
-    }
+        </div>
+    );
+}
 
-    export default Header;
+export default Header;

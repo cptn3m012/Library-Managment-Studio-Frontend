@@ -20,8 +20,8 @@ export const DASHBOARD_SIDEBAR_LINKS = [
 		path: '/employee',
 		icon: <HiOutlineUsers />,
         subLinks: [
-			{ label: 'Dodaj pracownika', path: '/add-employee' },
-			{ label: 'Edytuj pracownika', path: '/edit-employee' }
+			{ label: 'Lista pracowników', path: '/employee-list' },
+			{ label: 'Dodaj pracownika', path: '/add-employee' }
 		]
 	},
 	{
