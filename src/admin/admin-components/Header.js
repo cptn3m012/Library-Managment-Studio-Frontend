@@ -32,7 +32,7 @@ function Header({ toggleSidebar }) {
     }, [dropdownRef]);
 
     return (
-        <div className='h-16 px-4 flex justify-between items-center relative bg-white text-gray-900 dark:bg-gray-800 dark:text-white'>
+        <div className='h-16 px-4 flex justify-between items-center relative bg-white text-gray-900 border-b-2 border-gray-300 dark:bg-gray-800 dark:text-white'>
             <div className='flex items-center'>
                 <HiOutlineMenu className="text-3xl cursor-pointer" onClick={toggleSidebar} />
             </div>
