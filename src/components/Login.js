@@ -1,10 +1,15 @@
 import React, { useState } from "react";
-import Axios from "axios"; // Importuj Axios
+import { useNavigate } from "react-router-dom";
+import { jwtDecode as jwt_decode } from 'jwt-decode';
+import Axios from "axios";
 import background from "../images/background.png"; 
+import ConnectionUrl from "../utils/ConnectionUrl";
+import { successNotify, errorNotify } from "../utils/Notifications";
 
 const Login = () => {
   const [loginOrEmail, setLoginOrEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleLoginOrEmailChange = (e) => {
     setLoginOrEmail(e.target.value);
@@ -17,18 +22,27 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        const response = await Axios.post("http://localhost:5000/users/login", {  
+      const response = await Axios.post(`${ConnectionUrl.connectionUrlString}users/login`, {  
         username: loginOrEmail,
         password: password,
       });
   
       if (response.status === 200) {
-        // Tutaj możesz obsłużyć poprawne logowanie
         console.log("Zalogowano pomyślnie");
+        localStorage.setItem('token', response.data.access_token);
+        const decoded = jwt_decode(response.data.access_token);
+        successNotify('Pomyślnie zalogowano');
+        const isAdmin = decoded.sub.role_id === 1; // Zmienione z 'admin' na 1
+        if (isAdmin) {
+            navigate("/admin"); // Przekierowanie na dashboard admina
+        } else {
+            // Przekierowanie na dashboard pracownika lub inne miejsce
+            navigate("/staff"); // Zakładając, że masz ścieżkę '/staff' dla pracowników
+        }
       }
     } catch (error) {
-      // Tutaj możesz obsłużyć błąd logowania
-      console.error("Błąd logowania:", error.response.data.message);
+      console.error("Błąd logowania:", error.response?.data?.message || "Wystąpił błąd");
+      // Możesz tutaj ustawić stan błędu, aby wyświetlić wiadomość na interfejsie użytkownika
     }
   };
 

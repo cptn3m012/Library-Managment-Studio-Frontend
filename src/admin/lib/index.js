@@ -20,8 +20,8 @@ export const DASHBOARD_SIDEBAR_LINKS = [
 		path: '/employee',
 		icon: <HiOutlineUsers />,
         subLinks: [
-			{ label: 'Lista pracowników', path: '/employee-list' },
-			{ label: 'Dodaj pracownika', path: '/add-employee' }
+			{ label: 'Lista pracowników', path: 'employee-list' },
+			{ label: 'Dodaj pracownika', path: 'add-employee' }
 		]
 	},
 	{
@@ -30,7 +30,7 @@ export const DASHBOARD_SIDEBAR_LINKS = [
 		path: '/books',
 		icon: <HiOutlineBookOpen />,
         subLinks: [
-			{ label: 'Dodaj książkę', path: '/add-book' },
+			{ label: 'Dodaj książkę', path: 'add-book' },
 			{ label: 'Edytuj książkę', path: '/edit-book' },
             { label: 'Usuń książkę', path: '/delete-book' },
             { label: 'Przeglądaj książki', path: '/edit-book' }

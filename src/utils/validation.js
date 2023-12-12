@@ -1,13 +1,13 @@
 // Walidacja imienia pracownika (dopuszcza tylko litery i spacje, minimalna długość 2 znaki)
-export const validateFirstName = (firstName) => {
+export const validateFirstName = (first_name) => {
     const regex = /^[A-Za-z]{2,}(\s[A-Za-z]{2,})*$/;
-    return regex.test(firstName);
+    return regex.test(first_name);
 };
 
 // Walidacja nazwiska pracownika (podobnie jak imię)
-export const validateLastName = (lastName) => {
+export const validateLastName = (last_name) => {
     const regex = /^[A-Za-z]{2,}(\s[A-Za-z]{2,})*$/;
-    return regex.test(lastName);
+    return regex.test(last_name);
 };
 
 // Walidacja numeru PESEL (dokładnie 11 cyfr)
@@ -17,9 +17,9 @@ export const validatePesel = (pesel) => {
 };
 
 // Walidacja numeru telefonu (format ###-###-###)
-export const validatePhoneNumber = (phoneNumber) => {
+export const validatePhoneNumber = (phone_number) => {
     const regex = /^(\d{3}\s){2}\d{3}$/; 
-    return regex.test(phoneNumber);
+    return regex.test(phone_number);
 };
 
 // Walidacja adresu e-mail
@@ -45,4 +45,10 @@ export const validatePassword = (password) => {
     }
     
     return errors;
+};
+
+// Walidacja daty zatrudnienia (format YYYY-MM-DD)
+export const validateHiredDate = (hiredDate) => {
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    return regex.test(hiredDate);
 };
