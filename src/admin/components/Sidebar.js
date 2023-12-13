@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { DASHBOARD_SIDEBAR_LINKS, DASHBOARD_SIDEBAR_BOTTOM_LINKS } from '../lib';
 import { HiOutlineChevronRight, HiOutlineChevronDown } from 'react-icons/hi';
+import { successNotify } from '../../utils/Notifications';
 
 const linkClass =
 	'flex items-center gap-2 font-light px-3 py-2 hover:bg-neutral-700 hover:no-underline active:bg-neutral-600 rounded-sm text-base'
@@ -13,6 +14,12 @@ function SidebarLink({ link, isOpen, toggleSubMenu }) {
     const hasSubLinks = link.subLinks && link.subLinks.length > 0;
 
     const handleClick = (e) => {
+        if (link.action) {
+            e.preventDefault();
+            link.action(); // Wywołanie funkcji przekazanej w linku
+            return;
+        }
+
         if (hasSubLinks) {
             e.preventDefault(); // Zapobieganie standardowemu zachowaniu linku
             toggleSubMenu(link.key);
@@ -59,6 +66,14 @@ function SidebarLink({ link, isOpen, toggleSubMenu }) {
 
 function Sidebar() {
     const [openSubMenus, setOpenSubMenus] = useState({});
+    const navigate = useNavigate();
+
+     // Funkcja wylogowania
+     const logout = () => {
+        localStorage.removeItem('token');
+        successNotify('Poprawnie wylogowano!');
+        navigate('/login');
+    };
 
     const toggleSubMenu = (key) => {
         setOpenSubMenus(prevOpenSubMenus => ({
@@ -66,6 +81,9 @@ function Sidebar() {
             [key]: !prevOpenSubMenus[key]
         }));
     };
+
+    // Aktualizacja linku wylogowania
+    DASHBOARD_SIDEBAR_BOTTOM_LINKS.find(link => link.key === 'logout').action = logout;
 
     return(
         <div className='bg-neutral-900 w-60 p-3 flex flex-col text-white'>

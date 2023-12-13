@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode as jwt_decode } from 'jwt-decode';
 import Axios from "axios";
@@ -19,6 +19,11 @@ const Login = () => {
     setPassword(e.target.value);
   };
 
+  useEffect(() => {
+    // Usuwamy token z localStorage przy każdym montowaniu komponentu
+    localStorage.removeItem('token');
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -31,9 +36,9 @@ const Login = () => {
         console.log("Zalogowano pomyślnie");
         localStorage.setItem('token', response.data.access_token);
         const decoded = jwt_decode(response.data.access_token);
-        successNotify('Pomyślnie zalogowano');
         const isAdmin = decoded.sub.role_id === 1; // Zmienione z 'admin' na 1
         if (isAdmin) {
+            successNotify('Pomyślnie zalogowano');
             navigate("/admin"); // Przekierowanie na dashboard admina
         } else {
             // Przekierowanie na dashboard pracownika lub inne miejsce
