@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ConnectionUrl from '../../utils/ConnectionUrl';
-import Breadcrumb from '../components/Breadcrumb/Breadcrumb';
-import SearchBar from '../components/SearchBar/SearchBar';
+import Breadcrumb from '../components/Breadcrumb';
+import SearchBar from '../components/SearchBar';
 import Table from '../components/Table/Table';
-import Pagination from '../components/Pagination/Paginantion';
+import Pagination from '../components/Paginantion';
 import EditUserModal from '../modals/EditEmployeeModal';
 import DeleteEmployeeModal from '../modals/DeleteEmployeeModal';
+import { successNotify, errorNotify } from "../../utils/Notifications";
 
 function EmployeeListContainer() {
     const [employees, setEmployees] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
@@ -19,9 +21,15 @@ function EmployeeListContainer() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [employeeToDelete, setEmployeeToDelete] = useState(null);
 
+    const filteredEmployees = employees.filter(employee => {
+        const fullName = `${employee.first_name} ${employee.last_name}`.toLowerCase();
+        return fullName.includes(searchTerm);
+    });
+
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = employees.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = filteredEmployees.slice(indexOfFirstItem, indexOfLastItem);
+    const totalFilteredPages = Math.ceil(filteredEmployees.length / itemsPerPage);
 
     const pageNumbers = [];
     for (let i = 1; i <= Math.ceil(employees.length / itemsPerPage); i++) {
@@ -36,8 +44,8 @@ function EmployeeListContainer() {
     };
 
     const handleEditClick = (employee) => {
-        setEditingEmployee(employee); 
-        setIsEditModalOpen(true); 
+        setEditingEmployee(employee);
+        setIsEditModalOpen(true);
     };
 
     const handleCloseEditModal = () => {
@@ -57,57 +65,52 @@ function EmployeeListContainer() {
     };
 
     const handleSearch = (searchTerm) => {
-        // Logika wyszukiwania...
-    };
-
-    // Funkcje obsługujące edycję i usuwanie pracowników
-    const handleEdit = (employee) => {
-        // Logika edycji...
+        setSearchTerm(searchTerm.toLowerCase());
     };
 
     const handleInputChange = (event) => {
-        // Logika zmiany danych pracownika
+        const { name, value } = event.target;
+        setEditingEmployee(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
     };
 
-    const handleFormSubmit = (event) => {
+    const handleFormSubmit = async (event) => {
         event.preventDefault();
-        // Logika zapisu zmienionych danych pracownika
+
+        const updatedEmployeeData = {
+            first_name: editingEmployee.first_name,
+            last_name: editingEmployee.last_name,
+            pesel: editingEmployee.pesel,
+            email: editingEmployee.email,
+            phone_number: editingEmployee.phone_number,
+            hired_date: editingEmployee.hired_date
+        };
+
+        try {
+            const response = await axios.put(`${ConnectionUrl.connectionUrlString}api/employees/${editingEmployee.id}`, updatedEmployeeData);
+            const updatedEmployees = employees.map(emp => emp.id === editingEmployee.id ? { ...emp, ...updatedEmployeeData } : emp);
+            setEmployees(updatedEmployees);
+            setIsEditModalOpen(false);
+            console.log(response);
+            successNotify('Pomyślnie edytowano dane użytkownika');
+        } catch (error) {
+            errorNotify('Wystąpił błąd podczas aktualizacji danych pracownika')
+            console.error('Błąd podczas aktualizacji danych pracownika:', error);
+        }
     };
 
-    const [passwordData, setPasswordData] = useState({
-        passwordShown: false,
-        password: '',
-        confirmPassword: ''
-      });
-      const [passwordErrors, setPasswordErrors] = useState([]);
-
-
-    // const handleDeleteConfirm = async () => {
-    //     if (!employeeToDelete) return;
-
-    //     try {
-    //         await axios.delete(`${ConnectionUrl.connectionUrlString}api/employees/${employeeToDelete.id}`);
-    //         setEmployees(employees.filter(emp => emp.id !== employeeToDelete.id));
-    //         setIsDeleteModalOpen(false);
-    //     } catch (error) {
-    //         console.error('Error deleting employee: ', error);
-    //         // Handle the error here
-    //     }
-    // };
-
-    // const handleSave = async (updatedEmployee) => {
-    //     try {
-    //         // Zakładając, że masz endpoint API do aktualizacji danych pracownika
-    //         await axios.put(`${ConnectionUrl.connectionUrlString}api/employees/${updatedEmployee.id}`, updatedEmployee);
-    //         // Aktualizacja stanu pracowników
-    //         setEmployees(employees.map(emp => emp.id === updatedEmployee.id ? updatedEmployee : emp));
-    //         setIsEditModalOpen(false); // Zamknięcie modalu po zapisaniu
-    //     } catch (error) {
-    //         console.error('Error updating employee: ', error);
-    //         // Możesz tutaj dodać obsługę błędów, np. wyświetlić komunikat o błędzie
-    //     }
-    // };
-
+    const handleDeleteConfirm = async (employee) => {
+        try {
+            await axios.delete(`${ConnectionUrl.connectionUrlString}api/employees/${employee.id}`);
+            setEmployees(employees.filter(emp => emp.id !== employee.id));
+            setIsDeleteModalOpen(false);
+            successNotify('Pomyślnie usunięto pracownika');
+        } catch (error) {
+            console.error('Error deleting employee: ', error);
+        }
+    };
 
     useEffect(() => {
         const fetchEmployees = async () => {
@@ -125,7 +128,12 @@ function EmployeeListContainer() {
     return (
         <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 dark:bg-gray-800">
             <h1 className="text-2xl font-normal text-gray-900 mb-2 dark:text-white">Lista pracowników</h1>
-            <Breadcrumb />
+            <Breadcrumb
+                links={[
+                    { label: 'Home', path: '/' },
+                    { label: 'Lista pracowników', path: '/employees' }
+                ]}
+            />
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg border border-gray-300">
                 <SearchBar onSearch={handleSearch} />
                 <Table
@@ -133,10 +141,9 @@ function EmployeeListContainer() {
                     onEdit={handleEditClick}
                     onDelete={handleDelete}
                 />
-
                 <Pagination
                     currentPage={currentPage}
-                    totalPages={Math.ceil(employees.length / itemsPerPage)}
+                    totalPages={totalFilteredPages}
                     onPageChange={handlePageChange}
                 />
                 {isEditModalOpen && (
@@ -146,18 +153,14 @@ function EmployeeListContainer() {
                         employeeData={editingEmployee}
                         handleInputChange={handleInputChange}
                         handleFormSubmit={handleFormSubmit}
-                        passwordData={passwordData}
-                        
-                        passwordErrors={passwordErrors}
-                    confirmPassword={passwordData.confirmPassword}
-                    
                     />
                 )}
                 {isDeleteModalOpen && (
                     <DeleteEmployeeModal
                         isOpen={isDeleteModalOpen}
                         onClose={closeDeleteModal}
-                    // Możesz przekazać tutaj więcej propsów, np. funkcję do potwierdzenia usunięcia
+                        employeeToDelete={employeeToDelete}
+                        onConfirmDelete={handleDeleteConfirm}
                     />
                 )}
             </div>

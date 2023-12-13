@@ -11,7 +11,7 @@ export const DASHBOARD_SIDEBAR_LINKS = [
 	{
 		key: 'dashboard',
 		label: 'Dashboard',
-		path: '/login',
+		path: '/admin/dashboard',
 		icon: <HiOutlineViewGrid />
 	},
 	{
@@ -53,14 +53,14 @@ export const DASHBOARD_SIDEBAR_LINKS = [
 export const DASHBOARD_SIDEBAR_BOTTOM_LINKS = [
 	{
 		key: 'settings',
-		label: 'Settings',
+		label: 'Ustawienia',
 		path: '/settings',
 		icon: <HiOutlineCog />
 	},
     {
 		key: 'logout',
 		label: 'Wyloguj się',
-		path: '/logout',
+		action: () => {},
 		icon: <HiOutlineQuestionMarkCircle />
 	}
 ]

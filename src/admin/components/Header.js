@@ -3,10 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { HiOutlineMenu, HiUser } from "react-icons/hi";
 import DarkModeToggle from './DarkModeToggle';
 import { successNotify } from '../../utils/Notifications';
+import Axios from 'axios';
+import ConnectionUrl from '../../utils/ConnectionUrl' 
 
 function Header({ toggleSidebar }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isButtonFocused, setIsButtonFocused] = useState(false);
+    const [username, setUsername] = useState('');
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
 
@@ -25,6 +28,24 @@ function Header({ toggleSidebar }) {
         successNotify('Poprawnie wylogowano!');
         navigate('/login');
     };
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await Axios.get(`${ConnectionUrl.connectionUrlString}api/get-current-user`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                setUsername(response.data.username);
+            } catch (error) {
+                console.error('Błąd podczas pobierania danych użytkownika:', error.response ? error.response.data : error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -58,7 +79,7 @@ function Header({ toggleSidebar }) {
                     >
                         <span className="sr-only">Open user menu</span>
                         <HiUser className="w-8 h-8 me-2" />
-                        Bonnie Green
+                        {username || 'Loading...'}
                         <svg className="w-2.5 h-2.5 ms-3" fill="none" viewBox="0 0 10 6">
                             <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
                         </svg>
@@ -72,7 +93,7 @@ function Header({ toggleSidebar }) {
                     >
                         <div className="px-4 py-3 text-sm text-gray-900 dark:text-white">
                             <div className="font-medium">Admin</div>
-                            <div className="truncate">mail@gmail.com</div>
+                            <div className="truncate">admin@gmail.com</div>
                         </div>
                         <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownAvatarNameButton">
                             <li>

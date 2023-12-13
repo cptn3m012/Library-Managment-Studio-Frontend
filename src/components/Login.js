@@ -47,7 +47,7 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Błąd logowania:", error.response?.data?.message || "Wystąpił błąd");
-      // Możesz tutaj ustawić stan błędu, aby wyświetlić wiadomość na interfejsie użytkownika
+      errorNotify('Wystąpił błąd w logowaniu');
     }
   };
 

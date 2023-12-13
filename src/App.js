@@ -10,12 +10,14 @@ import StaffDashboard from './staff/Dashboard';
 import Unauthorized from './components/Unauthorized'; 
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import AdminDashboard from './admin/containers/DashboardContainer';
+import { errorNotify } from './utils/Notifications';
 
 function App() {
   const AdminRoute = ({ children }) => {
     const token = localStorage.getItem('token');
     if (!token) {
-      console.log("Brak tokena");
+      errorNotify('Brak tokena!');
       return <Navigate to="/login" />;
     }
 
@@ -43,6 +45,7 @@ function App() {
         <Route path="/" element={<Navigate replace to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<AdminRoute><Layout /></AdminRoute>}>
+          <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="add-employee" element={<AddEmployeeContainer />} />
           <Route path="employee-list" element={<EmployeeListContainer />} />
           <Route path="add-book" element={<AddBookContainer />} />
