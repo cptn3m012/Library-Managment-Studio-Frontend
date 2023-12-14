@@ -1,10 +1,37 @@
 import React from 'react';
 import EmployeeForm from '../containers/AddEmployeeContainer/EmployeeForm';
+import useFormValidation from '../hooks/useFormValidation';
+import useFormatters from '../hooks/useFormatters';
+import { errorNotify } from '../../utils/Notifications';
 
-function EditUserModal({ isOpen, onClose, employeeData, handleInputChange, handleFormSubmit }) {
+function EditUserModal({ isOpen, onClose, employeeData, handleFormSubmit }) {
+  const { formatPhoneNumber } = useFormatters();
+  const { formData, formErrors, handleInputChange, setFormErrors } = useFormValidation(employeeData);
+
+  const handleCustomInputChange = (e) => {
+    const { name, value } = e.target;
+    let newValue = value;
+
+    if (name === 'phone_number') {
+      newValue = formatPhoneNumber(value);
+    }
+    handleInputChange({ ...e, target: { ...e.target, name, value: newValue } });
+  };
 
   const handleCloseClick = () => {
     onClose();
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (Object.values(formErrors).some(error => error)) {
+      errorNotify('Masz błędy w formularzu. Popraw je przed wysłaniem.');
+      return;
+    }
+
+    handleFormSubmit(formData);
+    onClose(); 
   };
 
   return (
@@ -15,7 +42,7 @@ function EditUserModal({ isOpen, onClose, employeeData, handleInputChange, handl
       className={`fixed inset-0 z-50 flex justify-center pt-10 items-start ${isOpen ? "" : "hidden"} overflow-x-hidden overflow-y-auto`}
     >
       <div className="relative w-full max-w-2xl max-h-full">
-        <form onSubmit={handleFormSubmit} className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+        <form onSubmit={handleSubmit} className="relative bg-white rounded-lg shadow dark:bg-gray-700">
           <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
               Edytuj dane pracownika
@@ -45,9 +72,9 @@ function EditUserModal({ isOpen, onClose, employeeData, handleInputChange, handl
           </div>
           <div className="p-6 space-y-6">
             <EmployeeForm
-              formData={employeeData}
-              handleInputChange={handleInputChange}
-              formErrors={{}}
+              formData={formData}
+              handleInputChange={handleCustomInputChange}
+              formErrors={formErrors}
             />
           </div>
           <div className="flex items-center p-6 space-x-3 rtl:space-x-reverse border-t border-gray-200 rounded-b dark:border-gray-600">

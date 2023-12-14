@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ConnectionUrl from '../../utils/ConnectionUrl';
 import Breadcrumb from '../components/Breadcrumb';
@@ -10,6 +11,7 @@ import DeleteEmployeeModal from '../modals/DeleteEmployeeModal';
 import { successNotify, errorNotify } from "../../utils/Notifications";
 
 function EmployeeListContainer() {
+    const navigate = useNavigate();
     const [employees, setEmployees] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -68,6 +70,10 @@ function EmployeeListContainer() {
         setSearchTerm(searchTerm.toLowerCase());
     };
 
+    const handleButtonClick = () => {
+        navigate('/admin/add-employee');
+    };
+
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         setEditingEmployee(prevState => ({
@@ -76,18 +82,7 @@ function EmployeeListContainer() {
         }));
     };
 
-    const handleFormSubmit = async (event) => {
-        event.preventDefault();
-
-        const updatedEmployeeData = {
-            first_name: editingEmployee.first_name,
-            last_name: editingEmployee.last_name,
-            pesel: editingEmployee.pesel,
-            email: editingEmployee.email,
-            phone_number: editingEmployee.phone_number,
-            hired_date: editingEmployee.hired_date
-        };
-
+    const handleFormSubmit = async (updatedEmployeeData) => {
         try {
             const response = await axios.put(`${ConnectionUrl.connectionUrlString}api/employees/${editingEmployee.id}`, updatedEmployeeData);
             const updatedEmployees = employees.map(emp => emp.id === editingEmployee.id ? { ...emp, ...updatedEmployeeData } : emp);
@@ -96,7 +91,7 @@ function EmployeeListContainer() {
             console.log(response);
             successNotify('Pomyślnie edytowano dane użytkownika');
         } catch (error) {
-            errorNotify('Wystąpił błąd podczas aktualizacji danych pracownika')
+            errorNotify('Wystąpił błąd podczas aktualizacji danych pracownika');
             console.error('Błąd podczas aktualizacji danych pracownika:', error);
         }
     };
@@ -131,11 +126,19 @@ function EmployeeListContainer() {
             <Breadcrumb
                 links={[
                     { label: 'Home', path: '/' },
-                    { label: 'Lista pracowników', path: '/employees' }
+                    { label: 'Lista pracowników', path: '/admin/employee-list' }
                 ]}
             />
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg border border-gray-300">
-                <SearchBar onSearch={handleSearch} />
+                <div className="flex items-center justify-between flex-column md:flex-row flex-wrap space-y-4 md:space-y-0 py-4 bg-white dark:bg-gray-900 px-4 border border-gray-300">
+                    <SearchBar onSearch={handleSearch} />
+                    <button 
+                        onClick={handleButtonClick}
+                        className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 mt-4 rounded"
+                    >
+                        Dodaj pracownika
+                    </button>
+                </div>
                 <Table
                     employees={currentItems}
                     onEdit={handleEditClick}
@@ -151,7 +154,6 @@ function EmployeeListContainer() {
                         isOpen={isEditModalOpen}
                         onClose={handleCloseEditModal}
                         employeeData={editingEmployee}
-                        handleInputChange={handleInputChange}
                         handleFormSubmit={handleFormSubmit}
                     />
                 )}
