@@ -1,156 +1,87 @@
-//ten popover poprawić albo wyjebać
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
+import axios from 'axios';
 import EmployeeForm from './EmployeeForm';
 import LoginDataForm from './LoginDataForm';
 import Breadcrumb from '../../components/Breadcrumb';
-import axios from 'axios';
-import {
-    validateFirstName,
-    validateLastName,
-    validatePesel,
-    validatePhoneNumber,
-    validateEmail,
-    validatePassword,
-    validateHiredDate
-} from '../../../utils/validation';
 import ConnectionUrl from '../../../utils/ConnectionUrl';
+import { validatePassword } from '../../../utils/validation';
+import usePasswordValidation from '../../hooks/usePasswordValidation';
+import useFormValidation from '../../hooks/useFormValidation';
+import useFormatters from '../../hooks/useFormatters';
+import { successNotify, errorNotify } from '../../../utils/Notifications'
 
 function AddEmployeeContainer() {
     const today = new Date().toISOString().split('T')[0];
+    const { formatPhoneNumber } = useFormatters();
 
-    const [formErrors, setFormErrors] = useState({});
-    const [passwordShown, setPasswordShown] = useState(false);
-    const [password, setPassword] = useState('');
-    const [passwordErrors, setPasswordErrors] = useState([]);
-    const [passwordPopoverVisible, setPasswordPopoverVisible] = useState(false);
-    const [formSubmitted, setFormSubmitted] = useState(false);
-    const [confirmPassword, setConfirmPassword] = useState('');
+    const {
+        password,
+        confirmPassword,
+        passwordErrors,
+        passwordShown,
+        passwordPopoverVisible,
+        handlePasswordChange,
+        handleConfirmPasswordChange,
+        togglePasswordVisibility,
+        handlePasswordInputFocus,
+        handlePasswordInputBlur,
+        arePasswordsMatching
+    } = usePasswordValidation();
 
-    const fieldValidators = useMemo(() => ({
-        first_name: validateFirstName,
-        last_name: validateLastName,
-        pesel: validatePesel,
-        phone_number: validatePhoneNumber,
-        email: validateEmail,
-        hired_date: validateHiredDate
-    }), []);
-
-    const [formData, setFormData] = useState({
+    const initialFormData = {
         first_name: '',
         last_name: '',
         pesel: '',
         phone_number: '',
         email: '',
         hired_date: today
-    });
+    };
 
-    const handlePasswordInputFocus = useCallback(() => {
-        setPasswordPopoverVisible(passwordErrors.length > 0);
-    }, [passwordErrors]);
+    const { formData, formErrors, handleInputChange, setFormErrors } = useFormValidation(initialFormData);
 
-    const handlePasswordInputBlur = useCallback(() => {
-        setPasswordPopoverVisible(false);
-    }, []);
-
-    const togglePasswordVisibility = useCallback(() => {
-        setPasswordShown((prev) => !prev);
-        const timer = setTimeout(() => setPasswordShown(false), 1000);
-        return () => clearTimeout(timer);
-    }, []);
-
-    const handleInputChange = useCallback((e) => {
+    const handleCustomInputChange = useCallback((e) => {
         const { name, value } = e.target;
         let newValue = value;
 
         if (name === 'phone_number') {
             newValue = formatPhoneNumber(value);
         }
-
-        setFormData({ ...formData, [name]: newValue });
-
-        if (formSubmitted) {
-            const message = fieldValidators[name](newValue) ? '' : fieldValidationMessage(name);
-            setFormErrors({ ...formErrors, [name]: message });
-        }
-    }, [formData, formSubmitted, fieldValidators, formErrors]);
-
-    const handlePasswordChange = useCallback((e) => {
-        const newPassword = e.target.value;
-        setPassword(newPassword);
-        setPasswordErrors(validatePassword(newPassword));
-    }, []);
-
-    const handleConfirmPasswordChange = useCallback((e) => {
-        setConfirmPassword(e.target.value);
-    }, []);
-
-    const fieldValidationMessage = (fieldName) => {
-        switch (fieldName) {
-            case 'firstName': return 'Imię jest za krótkie lub zawiera niedozwolone znaki.';
-            case 'lastName': return 'Nazwisko jest za krótkie lub zawiera niedozwolone znaki.';
-            case 'pesel': return 'Numer PESEL powinien składać się z 11 cyfr.';
-            case 'phone_number': return 'Format numeru telefonu jest nieprawidłowy.';
-            case 'email': return 'Nieprawidłowy adres e-mail.';
-            default: return '';
-        }
-    };
-
-    const formatPhoneNumber = (value) => {
-        const cleaned = value.replace(/\D+/g, '').substring(0, 9);
-        const match = cleaned.match(/(\d{0,3})(\d{0,3})(\d{0,3})/);
-        return `${match[1]}${match[2] ? ' ' + match[2] : ''}${match[3] ? ' ' + match[3] : ''}`.trim();
-    };
+        handleInputChange({ ...e, target: { ...e.target, name, value: newValue } });
+    }, [handleInputChange, formatPhoneNumber]);
 
     const handleSubmit = useCallback((e) => {
         e.preventDefault();
-        setFormSubmitted(true);
 
-        const errors = {};
-        Object.keys(formData).forEach(fieldName => {
-            const fieldValue = formData[fieldName];
-            const message = fieldValidators[fieldName](fieldValue) ? '' : fieldValidationMessage(fieldName);
-            errors[fieldName] = message;
-        });
+        const passwordMatchError = !arePasswordsMatching() ? 'Hasła nie są identyczne' : '';
+        const updatedErrors = {
+            ...formErrors,
+            confirmPassword: passwordMatchError
+        };
 
-        // Sprawdzanie, czy hasła są identyczne
-        if (password !== confirmPassword) {
-            errors['confirmPassword'] = 'Hasła nie są identyczne';
-        }
-
-        const newPasswordErrors = validatePassword(password);
-        setPasswordErrors(newPasswordErrors);
-        setPasswordErrors(validatePassword(password));
-        setFormErrors(errors);
-
-        if (Object.values(errors).some(error => error)) {
+        if (Object.values(updatedErrors).some(error => error)) {
+            setFormErrors(updatedErrors);
             return;
         }
 
-        // Definiowanie asynchronicznej funkcji
-        const submitForm = async () => {
-            const employeeData = {
-                ...formData,
-                password,
-                hired_date: formData.hired_date || today
-            };
-
-            console.log("Wysyłanie danych pracownika:", employeeData);
-
-            try {
-                const response = await axios.post(`${ConnectionUrl.connectionUrlString}add-employee`, employeeData, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-            } catch (error) {
-                //console.error('Błąd podczas dodawania pracownika:', error);
-                console.error('Błąd podczas dodawania pracownika:', error.response ? error.response.data : error);
-            }
+        // Przygotowanie danych do wysłania
+        const employeeData = {
+            ...formData,
+            password
         };
 
-        // Wywołanie funkcji
-        submitForm();
-    }, [formData, password, confirmPassword, fieldValidators]);
+        // Asynchroniczne wysyłanie danych
+        axios.post(`${ConnectionUrl.connectionUrlString}add-employee`, employeeData, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            successNotify('Pracownik dodany pomyślnie');
+        }).catch(error => {
+            // Obsługa błędu
+            errorNotify('Błąd podczad dodawania pracownika');
+            console.error('Błąd podczas dodawania pracownika:', error.response ? error.response.data : error);
+        });
+    }, [formData, password, formErrors, arePasswordsMatching, setFormErrors]);
 
     return (
         <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 dark:bg-gray-800">
@@ -169,21 +100,27 @@ function AddEmployeeContainer() {
                     Podczas tworzenia pracownika na stronie, wprowadź jego dane osobowe, takie jak imię, nazwisko, PESEL, numer telefonu i adres e-mail, a także datę zatrudnienia. Następnie, stwórz bezpieczne hasło, które pracownik będzie używać do logowania, przy użyciu swojego adresu e-mail jako loginu.
                 </p>
             </div>
-            <EmployeeForm formData={formData} handleInputChange={handleInputChange} formErrors={formErrors} />
-            <LoginDataForm
-                passwordShown={passwordShown}
-                password={password}
-                confirmPassword={confirmPassword}
-                handlePasswordChange={handlePasswordChange}
-                handleConfirmPasswordChange={handleConfirmPasswordChange}
-                togglePasswordVisibility={togglePasswordVisibility}
-                passwordErrors={passwordErrors}
-                formErrors={formErrors}
-                validatePassword={validatePassword}
-                handlePasswordInputFocus={handlePasswordInputFocus}
-                handlePasswordInputBlur={handlePasswordInputBlur}
-                passwordPopoverVisible={passwordPopoverVisible}
-            />
+            <fieldset className="border border-gray-300 p-3 mb-6">
+                <legend className="text-lg font-semibold text-gray-900 dark:text-white px-2">Dane pracownika:</legend>
+                <EmployeeForm formData={formData} handleInputChange={handleCustomInputChange} formErrors={formErrors} />
+            </fieldset>
+            <fieldset className="border border-gray-300 p-3 mb-6">
+                <legend className="text-lg font-semibold text-gray-900 dark:text-white px-2">Hasło pracownika:</legend>
+                <LoginDataForm
+                    passwordShown={passwordShown}
+                    password={password}
+                    confirmPassword={confirmPassword}
+                    handlePasswordChange={handlePasswordChange}
+                    handleConfirmPasswordChange={handleConfirmPasswordChange}
+                    togglePasswordVisibility={togglePasswordVisibility}
+                    passwordErrors={passwordErrors}
+                    formErrors={formErrors}
+                    validatePassword={validatePassword}
+                    handlePasswordInputFocus={handlePasswordInputFocus}
+                    handlePasswordInputBlur={handlePasswordInputBlur}
+                    passwordPopoverVisible={passwordPopoverVisible}
+                />
+            </fieldset>
             <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
         </form>
     );
