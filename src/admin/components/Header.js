@@ -5,10 +5,12 @@ import DarkModeToggle from './DarkModeToggle';
 import { successNotify } from '../../utils/Notifications';
 import Axios from 'axios';
 import ConnectionUrl from '../../utils/ConnectionUrl' 
+import EditCurrentUserModal from '../modals/EditCurrentUserModal';
 
 function Header({ toggleSidebar }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isButtonFocused, setIsButtonFocused] = useState(false);
+    const [isEditCurrentUserModalOpen, setIsEditCurrentUserModalOpen] = useState(false);
     const [username, setUsername] = useState('');
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
@@ -22,6 +24,14 @@ function Header({ toggleSidebar }) {
             setIsButtonFocused(false);
         }
     }
+
+    const handleEditCurrentUserClick = () => {
+        setIsEditCurrentUserModalOpen(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setIsEditCurrentUserModalOpen(false);
+    };
 
     const logout = () => {
         localStorage.removeItem('token');
@@ -100,7 +110,7 @@ function Header({ toggleSidebar }) {
                                 <a href="/login" className='block px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'>Dashboard</a>
                             </li>
                             <li>
-                                <a href="/settings" className='block px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'>Ustawienia</a>
+                                <button onClick={handleEditCurrentUserClick} className='block px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'>Ustawienia</button>
                             </li>
                         </ul>
                         <div className="py-2">
@@ -114,6 +124,14 @@ function Header({ toggleSidebar }) {
                     </div>
                 </div>
             </div>
+            {isEditCurrentUserModalOpen && (
+                <EditCurrentUserModal
+                    isOpen={isEditCurrentUserModalOpen}
+                    onClose={handleCloseEditModal}
+                    currentUsername={username}
+                    updateUsername={setUsername} 
+                />
+            )}
         </div>
     );
 }
