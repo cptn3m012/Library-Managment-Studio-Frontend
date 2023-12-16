@@ -12,6 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import AdminDashboard from './admin/containers/DashboardContainer';
 import { errorNotify } from './utils/Notifications';
+import BooksListContainer from './admin/containers/BooksListContainer';
 
 function App() {
   const AdminRoute = ({ children }) => {
@@ -49,6 +50,7 @@ function App() {
           <Route path="add-employee" element={<AddEmployeeContainer />} />
           <Route path="employee-list" element={<EmployeeListContainer />} />
           <Route path="add-book" element={<AddBookContainer />} />
+          <Route path="books-list" element={<BooksListContainer />} />
         </Route>
         <Route path="/staff" element={<StaffRoute><StaffDashboard /></StaffRoute>} />
         <Route path="/unauthorized" element={<Unauthorized />} /> {/* Dodana nowa ścieżka */}

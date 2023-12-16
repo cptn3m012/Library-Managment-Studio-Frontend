@@ -30,10 +30,8 @@ export const DASHBOARD_SIDEBAR_LINKS = [
 		path: '/books',
 		icon: <HiOutlineBookOpen />,
         subLinks: [
-			{ label: 'Dodaj książkę', path: 'add-book' },
-			{ label: 'Edytuj książkę', path: '/edit-book' },
-            { label: 'Usuń książkę', path: '/delete-book' },
-            { label: 'Przeglądaj książki', path: '/edit-book' }
+			{ label: 'Lista książęk', path: 'books-list' },
+			{ label: 'Dodaj książkę', path: 'add-book' }
 		]
 	},
 	{

@@ -8,6 +8,8 @@ function EditUserModal({ isOpen, onClose, employeeData, handleFormSubmit }) {
   const { formatPhoneNumber } = useFormatters();
   const { formData, formErrors, handleInputChange, setFormErrors } = useFormValidation(employeeData);
 
+  const overlayStyle = `absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0'}`;
+
   const handleCustomInputChange = (e) => {
     const { name, value } = e.target;
     let newValue = value;
@@ -31,7 +33,7 @@ function EditUserModal({ isOpen, onClose, employeeData, handleFormSubmit }) {
     }
 
     handleFormSubmit(formData);
-    onClose(); 
+    onClose();
   };
 
   return (
@@ -41,6 +43,7 @@ function EditUserModal({ isOpen, onClose, employeeData, handleFormSubmit }) {
       aria-hidden="true"
       className={`fixed inset-0 z-50 flex justify-center pt-10 items-start ${isOpen ? "" : "hidden"} overflow-x-hidden overflow-y-auto`}
     >
+      <div className={overlayStyle} aria-hidden="true" onClick={onClose}></div>
       <div className="relative w-full max-w-2xl max-h-full">
         <form onSubmit={handleSubmit} className="relative bg-white rounded-lg shadow dark:bg-gray-700">
           <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">

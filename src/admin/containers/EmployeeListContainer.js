@@ -74,14 +74,6 @@ function EmployeeListContainer() {
         navigate('/admin/add-employee');
     };
 
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setEditingEmployee(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
-
     const handleFormSubmit = async (updatedEmployeeData) => {
         try {
             const response = await axios.put(`${ConnectionUrl.connectionUrlString}api/employees/${editingEmployee.id}`, updatedEmployeeData);
@@ -99,7 +91,19 @@ function EmployeeListContainer() {
     const handleDeleteConfirm = async (employee) => {
         try {
             await axios.delete(`${ConnectionUrl.connectionUrlString}api/employees/${employee.id}`);
-            setEmployees(employees.filter(emp => emp.id !== employee.id));
+            const updatedEmployees = employees.filter(emp => emp.id !== employee.id);
+            setEmployees(updatedEmployees);
+
+            // Check if the current page has any items left after deletion
+            const updatedFilteredEmployees = updatedEmployees.filter(emp => {
+                const fullName = `${emp.first_name} ${emp.last_name}`.toLowerCase();
+                return fullName.includes(searchTerm);
+            });
+
+            if (updatedFilteredEmployees.length <= (currentPage - 1) * itemsPerPage && currentPage > 1) {
+                setCurrentPage(currentPage - 1); // Navigate to the previous page
+            }
+
             setIsDeleteModalOpen(false);
             successNotify('Pomyślnie usunięto pracownika');
         } catch (error) {
@@ -132,7 +136,7 @@ function EmployeeListContainer() {
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg border border-gray-300">
                 <div className="flex items-center justify-between flex-column md:flex-row flex-wrap space-y-4 md:space-y-0 py-4 bg-white dark:bg-gray-900 px-4 border border-gray-300">
                     <SearchBar onSearch={handleSearch} />
-                    <button 
+                    <button
                         onClick={handleButtonClick}
                         className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 mt-4 rounded"
                     >

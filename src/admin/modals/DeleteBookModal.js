@@ -1,11 +1,11 @@
 import React from 'react';
 import { HiOutlineQuestionMarkCircle } from "react-icons/hi";
 
-const DeleteEmployeeModal = ({ isOpen, onClose, employeeToDelete, onConfirmDelete }) => {
+const DeleteBookModal = ({ isOpen, onClose, bookToDelete, onConfirmDelete }) => {
     if (!isOpen) return null;
 
     const handleDeleteConfirm = () => {
-        onConfirmDelete(employeeToDelete);
+        onConfirmDelete(bookToDelete);
     };
 
     return (
@@ -16,7 +16,7 @@ const DeleteEmployeeModal = ({ isOpen, onClose, employeeToDelete, onConfirmDelet
                 </div>
 
                 <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
+                
                 <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                     <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div className="sm:flex sm:items-start">
@@ -29,7 +29,7 @@ const DeleteEmployeeModal = ({ isOpen, onClose, employeeToDelete, onConfirmDelet
                                 </h3>
                                 <div className="mt-2">
                                     <p className="text-sm text-gray-500">
-                                        Czy na pewno chcesz usunąć tego pracownika? Ta operacja jest nieodwracalna.
+                                        Czy na pewno chcesz usunąć tę książkę? Ta operacja jest nieodwracalna.
                                     </p>
                                 </div>
                             </div>
@@ -49,4 +49,4 @@ const DeleteEmployeeModal = ({ isOpen, onClose, employeeToDelete, onConfirmDelet
     );
 };
 
-export default DeleteEmployeeModal;
+export default DeleteBookModal;
