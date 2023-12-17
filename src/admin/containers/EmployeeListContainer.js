@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ConnectionUrl from '../../utils/ConnectionUrl';
-import Breadcrumb from '../components/Breadcrumb';
-import SearchBar from '../components/SearchBar';
+import Breadcrumb from '../../components/Breadcrumb';
+import SearchBar from '../../components/SearchBar';
 import Table from '../components/Table/Table';
-import Pagination from '../components/Paginantion';
+import Pagination from '../../components/Paginantion';
 import EditUserModal from '../modals/EditEmployeeModal';
 import DeleteEmployeeModal from '../modals/DeleteEmployeeModal';
 import { successNotify, errorNotify } from "../../utils/Notifications";
@@ -135,10 +135,10 @@ function EmployeeListContainer() {
             />
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg border border-gray-300">
                 <div className="flex items-center justify-between flex-column md:flex-row flex-wrap space-y-4 md:space-y-0 py-4 bg-white dark:bg-gray-900 px-4 border border-gray-300">
-                    <SearchBar onSearch={handleSearch} />
+                    <SearchBar onSearch={handleSearch} placeholder={'Wyszukaj pracownika'}/>
                     <button
                         onClick={handleButtonClick}
-                        className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-2 mt-4 rounded"
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 mt-4 rounded"
                     >
                         Dodaj pracownika
                     </button>

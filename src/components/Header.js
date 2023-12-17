@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HiOutlineMenu, HiUser } from "react-icons/hi";
 import DarkModeToggle from './DarkModeToggle';
-import { successNotify } from '../../utils/Notifications';
+import { successNotify } from '../utils/Notifications';
 import Axios from 'axios';
-import ConnectionUrl from '../../utils/ConnectionUrl' 
-import EditCurrentUserModal from '../modals/EditCurrentUserModal';
+import ConnectionUrl from '../utils/ConnectionUrl' 
+import EditCurrentUserModal from '../admin/modals/EditCurrentUserModal';
 
 function Header({ toggleSidebar }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);

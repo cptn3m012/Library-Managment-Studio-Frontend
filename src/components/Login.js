@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode as jwt_decode } from 'jwt-decode';
 import Axios from "axios";
-import background from "../images/background.png"; 
+import background from "../images/background.png";
 import ConnectionUrl from "../utils/ConnectionUrl";
 import { successNotify, errorNotify } from "../utils/Notifications";
 
@@ -27,22 +27,22 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await Axios.post(`${ConnectionUrl.connectionUrlString}users/login`, {  
+      const response = await Axios.post(`${ConnectionUrl.connectionUrlString}users/login`, {
         username: loginOrEmail,
         password: password,
       });
-  
+
       if (response.status === 200) {
         console.log("Zalogowano pomyślnie");
         localStorage.setItem('token', response.data.access_token);
         const decoded = jwt_decode(response.data.access_token);
         const isAdmin = decoded.sub.role_id === 1; // Zmienione z 'admin' na 1
         if (isAdmin) {
-            successNotify('Pomyślnie zalogowano');
-            navigate("/admin"); // Przekierowanie na dashboard admina
+          successNotify('Pomyślnie zalogowano');
+          navigate("/admin");
         } else {
-            // Przekierowanie na dashboard pracownika lub inne miejsce
-            navigate("/staff"); // Zakładając, że masz ścieżkę '/staff' dla pracowników
+          successNotify('Pomyślnie zalogowano');
+          navigate("/staff");
         }
       }
     } catch (error) {

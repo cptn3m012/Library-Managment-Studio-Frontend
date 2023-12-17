@@ -3,7 +3,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import { Outlet } from 'react-router-dom';
 
-function Layout() {
+function Layout({ role }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
     const toggleSidebar = () => {
@@ -11,8 +11,8 @@ function Layout() {
     }
 
     return (
-        <div className='flex flex-row bg-neutral-500 h-screen w-screen overflow-hidden'>
-            {isSidebarOpen && <Sidebar />}
+        <div className='flex flex-row bg-neutral-400 h-screen w-screen overflow-hidden'>
+            {isSidebarOpen && <Sidebar role={role}/>}
             <div className='flex flex-col flex-1'>
                 <Header toggleSidebar={toggleSidebar} />
                 <div className='overflow-y-auto flex-1 p-4'>

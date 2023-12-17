@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import AddCategoryModal from '../modals/AddCategoryModal';
-import Breadcrumb from '../components/Breadcrumb';
+import Breadcrumb from '../../components/Breadcrumb';
 import { HiOutlinePlusCircle } from "react-icons/hi";
 import axios from 'axios';
 import ConnectionUrl from '../../utils/ConnectionUrl';
+import DeleteCategoryModal from '../modals/DeleteCategoryModal';
 import { successNotify, errorNotify } from '../../utils/Notifications';
 
 function AddBookContainer() {
@@ -17,6 +18,7 @@ function AddBookContainer() {
     });
     const [categories, setCategories] = useState([]);
     const [isAddCategoryModalOpen, setAddCategoryModalOpen] = useState(false);
+    const [isDeleteCategoryModalOpen, setIsDeleteCategoryModalOpen] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
     const fetchCategories = async () => {
@@ -100,6 +102,14 @@ function AddBookContainer() {
                 errorNotify("Wystąpił błąd podczas przetwarzania żądania.");
             }
         }
+    };
+
+    const openDeleteCategoryModal = () => {
+        if (!formData.category) {
+            console.error("No category selected to delete");
+            return;
+        }
+        setIsDeleteCategoryModalOpen(true);
     };
 
     return (
@@ -201,6 +211,12 @@ function AddBookContainer() {
                         ))}
                         <option value="addCategory">Dodaj kategorię...</option>
                     </select>
+                    <span
+                        className="text-red-500 hover:text-red-600 cursor-pointer"
+                        onClick={openDeleteCategoryModal}
+                    >
+                        Usuń Kategorię
+                    </span>
                 </div>
                 <AddCategoryModal
                     isOpen={isAddCategoryModalOpen}
@@ -210,6 +226,20 @@ function AddBookContainer() {
                     }}
                     onCategoryAdd={handleCategoryAdd}
                 />
+                {isDeleteCategoryModalOpen && (
+                    <DeleteCategoryModal
+                        isOpen={isDeleteCategoryModalOpen}
+                        onClose={() => setIsDeleteCategoryModalOpen(false)}
+                        categoryId={formData.category}
+                        onCategoryDelete={() => {
+                            // Usuwanie kategorii z lokalnego stanu
+                            setCategories(prevCategories => prevCategories.filter(cat => cat.id.toString() !== formData.category));
+                            // Resetowanie wybranej kategorii w formularzu
+                            setFormData({ ...formData, category: '' });
+                            setIsDeleteCategoryModalOpen(false);
+                        }}
+                    />
+                )}
                 <div className="grid gap-6 mb-6 md:grid-cols-2">
                     <div>
                         <label htmlFor="quantity" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ilość:</label>

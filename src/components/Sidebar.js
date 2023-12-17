@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { DASHBOARD_SIDEBAR_LINKS, DASHBOARD_SIDEBAR_BOTTOM_LINKS } from '../lib';
+import { DASHBOARD_SIDEBAR_LINKS, DASHBOARD_SIDEBAR_BOTTOM_LINKS } from '../admin/lib';
+import { EMPLOYEE_SIDEBAR_LINKS, EMPLOYEE_SIDEBAR_BOTTOM_LINKS } from '../staff/lib/employeeLib';
 import { HiOutlineChevronRight, HiOutlineChevronDown } from 'react-icons/hi';
-import { successNotify } from '../../utils/Notifications';
+import { successNotify } from '../utils/Notifications';
 
 const linkClass =
-	'flex items-center gap-2 font-light px-3 py-2 hover:bg-neutral-700 hover:no-underline active:bg-neutral-600 rounded-sm text-base'
+    'flex items-center gap-2 font-light px-3 py-2 hover:bg-neutral-700 hover:no-underline active:bg-neutral-600 rounded-sm text-base'
 
 function SidebarLink({ link, isOpen, toggleSubMenu }) {
     const { pathname } = useLocation();
@@ -64,17 +65,22 @@ function SidebarLink({ link, isOpen, toggleSubMenu }) {
 
 
 
-function Sidebar() {
+function Sidebar({ role }) {
     const [openSubMenus, setOpenSubMenus] = useState({});
     const navigate = useNavigate();
 
-     // Funkcja wylogowania
-     const logout = () => {
+    // Wybranie zestawów linków na podstawie roli
+    const sidebarLinks = role === 'admin' ? DASHBOARD_SIDEBAR_LINKS : EMPLOYEE_SIDEBAR_LINKS;
+    const sidebarBottomLinks = role === 'admin' ? DASHBOARD_SIDEBAR_BOTTOM_LINKS : EMPLOYEE_SIDEBAR_BOTTOM_LINKS;
+
+    // Funkcja wylogowania
+    const logout = () => {
         localStorage.removeItem('token');
         successNotify('Poprawnie wylogowano!');
         navigate('/login');
     };
 
+    // Logika przełączania podmenu
     const toggleSubMenu = (key) => {
         setOpenSubMenus(prevOpenSubMenus => ({
             ...prevOpenSubMenus,
@@ -83,23 +89,23 @@ function Sidebar() {
     };
 
     // Aktualizacja linku wylogowania
-    DASHBOARD_SIDEBAR_BOTTOM_LINKS.find(link => link.key === 'logout').action = logout;
+    sidebarBottomLinks.find(link => link.key === 'logout').action = logout;
 
-    return(
+    return (
         <div className='bg-neutral-900 w-60 p-3 flex flex-col text-white'>
             <div className='flex items-center gap-2 px-1 py-3'>
                 {/* <img src={logo} className="w-10" alt="Logo"/> */}
                 <span className="text-xl font-semibold text-white">Library Management</span>
             </div>
             <div className="py-8 flex flex-1 flex-col gap-0.5">
-				{DASHBOARD_SIDEBAR_LINKS.map((link) => (
-					 <SidebarLink key={link.key} link={link} isOpen={openSubMenus} toggleSubMenu={toggleSubMenu} />
-				    ))}
-			</div>
+                {sidebarLinks.map((link) => (
+                    <SidebarLink key={link.key} link={link} isOpen={openSubMenus} toggleSubMenu={toggleSubMenu} />
+                ))}
+            </div>
             <div>
-                {DASHBOARD_SIDEBAR_BOTTOM_LINKS.map((link) => (
-                        <SidebarLink key={link.key} link={link} />
-                    ))}
+                {sidebarBottomLinks.map((link) => (
+                    <SidebarLink key={link.key} link={link} />
+                ))}
             </div>
         </div>
     );
