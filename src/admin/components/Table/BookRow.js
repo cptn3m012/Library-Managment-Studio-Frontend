@@ -1,6 +1,6 @@
 import React from 'react';
 
-const BookRow = ({ book, onEdit, onDelete }) => {
+const BookRow = ({ book, onEdit, onDelete, onLoan, isAdmin, isStaff }) => {
     const authorsList = book.authors.map(author =>
         `${author.firstName} ${author.lastName}`
     ).join(', ');
@@ -17,28 +17,39 @@ const BookRow = ({ book, onEdit, onDelete }) => {
                 {book.publisher}
             </td>
             <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                {book.publication_year} 
+                {book.publication_year}
             </td>
             <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 {authorsList}
             </td>
             <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                {book.category} 
+                {book.category}
             </td>
             <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 {book.status}
             </td>
             <td className="px-6 py-4 text-left whitespace-nowrap">
-                <button 
-                    className="px-2 py-1 text-sm text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring"
-                    onClick={() => onEdit(book)}>
-                    Edytuj
-                </button>
-                <button 
-                    className="ml-2 px-2 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none focus:ring"
-                    onClick={() => onDelete(book)}>
-                    Usuń
-                </button>
+                {isAdmin && (
+                    <>
+                        <button
+                            className="px-2 py-1 text-sm text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none focus:ring"
+                            onClick={() => onEdit(book)}>
+                            Edytuj
+                        </button>
+                        <button
+                            className="ml-2 px-2 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none focus:ring"
+                            onClick={() => onDelete(book)}>
+                            Usuń
+                        </button>
+                    </>
+                )}
+                {isStaff && !isAdmin && (
+                    <button
+                        className="px-2 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring"
+                        onClick={() => onLoan(book)}>
+                        Wypożycz
+                    </button>
+                )}
             </td>
         </tr>
     );

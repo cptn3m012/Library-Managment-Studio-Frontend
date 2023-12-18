@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { jwtDecode as jwt_decode } from 'jwt-decode';
 import ConnectionUrl from '../../utils/ConnectionUrl';
 import Breadcrumb from '../../components/Breadcrumb';
 import SearchBar from '../../components/SearchBar';
@@ -8,6 +9,7 @@ import BookTable from '../components/Table/BookTable';
 import Pagination from '../../components/Paginantion';
 import EditBookModal from '../modals/EditBookModal';
 import DeleteBookModal from '../modals/DeleteBookModal';
+import LoanBookModal from '../../staff/modals/LoanBookModal';
 import { successNotify, errorNotify } from '../../utils/Notifications';
 
 function BooksListContainer() {
@@ -23,12 +25,24 @@ function BooksListContainer() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [bookToDelete, setBookToDelete] = useState(null);
 
+    const [isLoanModalOpen, setIsLoanModalOpen] = useState(false);
+    const [selectedBookForLoan, setSelectedBookForLoan] = useState(null);
+
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isStaff, setIsStaff] = useState(false);
+
     const handleSearch = (searchValue) => {
         setSearchTerm(searchValue.toLowerCase());
     };
 
     const filteredBooks = books.filter(book => {
-        return book.title.toLowerCase().includes(searchTerm);
+        return book.title.toLowerCase().includes(searchTerm)
+            || book.isbn.toLowerCase().includes(searchTerm)
+            || book.publisher.toLowerCase().includes(searchTerm)
+            || book.publication_year.toString().toLowerCase().includes(searchTerm)
+            || book.authors.some(author => `${author.firstName} ${author.lastName}`.toLowerCase().includes(searchTerm))
+            || book.category.toLowerCase().includes(searchTerm)
+            || book.status.toLowerCase().includes(searchTerm);
     });
 
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -65,6 +79,15 @@ function BooksListContainer() {
 
     const handleCloseEditModal = () => {
         setIsEditModalOpen(false);
+    };
+
+    const handleLoanClick = (book) => {
+        setSelectedBookForLoan(book);
+        setIsLoanModalOpen(true);
+    };
+    
+    const handleCloseLoanModal = () => {
+        setIsLoanModalOpen(false);
     };
 
     const handleFormSubmit = async (updatedBookData) => {
@@ -131,6 +154,8 @@ function BooksListContainer() {
         }
     };
 
+    
+
     const fetchBooks = async () => {
         try {
             const response = await axios.get(`${ConnectionUrl.connectionUrlString}api/books`);
@@ -148,8 +173,23 @@ function BooksListContainer() {
     };
 
     useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const decoded = jwt_decode(token);
+            setIsAdmin(decoded.sub.role_id === 1);
+            setIsStaff(decoded.sub.role_id === 2);
+        }
         fetchBooks();
-    }, [books]);
+
+        // Oblicz nową ilość stron po filtracji
+        const totalFiltered = filteredBooks.length;
+        const totalFilteredPages = Math.ceil(totalFiltered / itemsPerPage);
+
+        // Aktualizuj currentPage tylko, jeśli jest poza zakresem nowej ilości stron
+        if (currentPage > totalFilteredPages) {
+            setCurrentPage(totalFilteredPages || 1); // Ustaw na 1, jeśli nie ma żadnych stron
+        }
+    }, [books, searchTerm, currentPage, filteredBooks.length]);
 
     return (
         <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 dark:bg-gray-800">
@@ -163,24 +203,37 @@ function BooksListContainer() {
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg border border-gray-300">
                 <div className="flex items-center justify-between flex-column md:flex-row flex-wrap space-y-4 md:space-y-0 py-4 bg-white dark:bg-gray-900 px-4 border border-gray-300">
                     <SearchBar onSearch={handleSearch} placeholder={'Wyszukaj książkę'} />
-                    <button
-                        onClick={() => navigate('/admin/add-book')}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 mt-4 rounded"
-                    >
-                        Dodaj książkę
-                    </button>
+                    {isAdmin && (
+                        <button
+                            onClick={() => navigate('/admin/add-book')}
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 mt-4 rounded"
+                        >
+                            Dodaj książkę
+                        </button>
+                    )}
+                    {isStaff && !isAdmin && (
+                        <button
+                            onClick={() => navigate('/staff/borrow-book')} // Załóżmy, że to jest ścieżka do strony wypożyczeń
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 mt-4 rounded"
+                        >
+                            Wypożycz książkę
+                        </button>
+                    )}
                 </div>
                 <BookTable
                     books={currentItems}
                     onEdit={handleEditClick}
                     onDelete={handleDeleteClick}
+                    onLoan={handleLoanClick}
+                    isAdmin={isAdmin}
+                    isStaff={isStaff}
                 />
                 <Pagination
                     currentPage={currentPage}
                     totalPages={totalFilteredPages}
                     onPageChange={handlePageChange}
                 />
-                {isEditModalOpen && (
+                {isEditModalOpen && isAdmin && (
                     <EditBookModal
                         isOpen={isEditModalOpen}
                         onClose={handleCloseEditModal}
@@ -188,12 +241,19 @@ function BooksListContainer() {
                         handleFormSubmit={handleFormSubmit}
                     />
                 )}
-                {isDeleteModalOpen && (
+                {isDeleteModalOpen && isAdmin && (
                     <DeleteBookModal
                         isOpen={isDeleteModalOpen}
                         onClose={closeDeleteModal}
                         bookToDelete={bookToDelete}
                         onConfirmDelete={handleDeleteConfirm}
+                    />
+                )}
+                {isStaff && !isAdmin && isLoanModalOpen && (
+                    <LoanBookModal
+                        isOpen={isLoanModalOpen}
+                        onClose={handleCloseLoanModal}
+                        selectedBook={selectedBookForLoan}
                     />
                 )}
             </div>

@@ -6,7 +6,7 @@ import { errorNotify } from '../../utils/Notifications';
 
 function EditUserModal({ isOpen, onClose, employeeData, handleFormSubmit }) {
   const { formatPhoneNumber } = useFormatters();
-  const { formData, formErrors, handleInputChange, setFormErrors } = useFormValidation(employeeData);
+  const { formData, formErrors, handleInputChange } = useFormValidation(employeeData);
 
   const overlayStyle = `absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0'}`;
 

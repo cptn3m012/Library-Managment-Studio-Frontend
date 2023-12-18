@@ -58,7 +58,8 @@ function App() {
           <Route index element={<StaffDashboard />} />
           <Route path="add-reader" element={<AddReaderContainer />} />
           <Route path="readers-list" element={<ReaderListContainer />} />  
-          {/* Tu możesz dodać więcej ścieżek dostępnych tylko dla personelu */}
+          <Route path="books-list" element={<BooksListContainer />} />
+          {/* <Route path="borrow-book" element={<BorrowBookContainer />} />     */}
         </Route>
         <Route path="/unauthorized" element={<Unauthorized />} /> {/* Dodana nowa ścieżka */}
       </Routes>

@@ -1,7 +1,7 @@
 import React from 'react';
 import BookRow from './BookRow';
 
-const BookTable = ({ books, onEdit, onDelete }) => {
+const BookTable = ({ books, onEdit, onDelete, onLoan, isAdmin, isStaff }) => {
     return (
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -38,7 +38,10 @@ const BookTable = ({ books, onEdit, onDelete }) => {
                         key={book.id}
                         book={book}
                         onEdit={onEdit}
+                        onLoan={onLoan}
                         onDelete={onDelete}
+                        isAdmin={isAdmin}
+                        isStaff={isStaff}
                     />
                 ))}
             </tbody>
