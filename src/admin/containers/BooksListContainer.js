@@ -82,7 +82,8 @@ function BooksListContainer() {
     };
 
     const handleLoanClick = (book) => {
-        setSelectedBookForLoan(book);
+        const bookId = book.id.split('-')[0]; // Rozdzielanie ID od indexu
+        setSelectedBookForLoan({ ...book, id: bookId });
         setIsLoanModalOpen(true);
     };
     
@@ -153,8 +154,6 @@ function BooksListContainer() {
             closeDeleteModal();
         }
     };
-
-    
 
     const fetchBooks = async () => {
         try {
@@ -254,6 +253,7 @@ function BooksListContainer() {
                         isOpen={isLoanModalOpen}
                         onClose={handleCloseLoanModal}
                         selectedBook={selectedBookForLoan}
+                        fetchBooks={fetchBooks}
                     />
                 )}
             </div>
