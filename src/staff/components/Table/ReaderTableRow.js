@@ -6,9 +6,9 @@ const ReaderTableRow = ({ reader, onEdit, onDelete }) => {
             <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                 {reader.first_name} {reader.last_name}
             </td>
-            <td className="px-6 py-4 text-gray-900 dark:text-white">{reader.pesel}</td>
-            <td className="px-6 py-4 text-gray-900 dark:text-white">{reader.address}</td>
-            <td className="px-6 py-4 text-gray-900 dark:text-white">{reader.postal_code} {reader.city}</td>
+            <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{reader.pesel}</td>
+            <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{reader.address}</td>
+            <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{reader.postal_code} {reader.city}</td>
             <td className="px-6 py-4">
                 <a href={`mailto:${reader.email}`} className="text-blue-600 hover:text-blue-800 underline">
                     {reader.email}
