@@ -40,8 +40,8 @@ export const validatePassword = (password) => {
         errors.push('Musisz zawierać wielkie i małe litery');
     }
 
-    if (!/[#$&]/.test(password)) {
-        errors.push('Musisz zawierać jeden z symboli (#$&)');
+    if (!/[#$&.!]/.test(password)) {
+        errors.push('Musisz zawierać jeden z symboli (#$&.!)');
     }
     
     return errors;
@@ -51,4 +51,18 @@ export const validatePassword = (password) => {
 export const validateHiredDate = (hiredDate) => {
     const regex = /^\d{4}-\d{2}-\d{2}$/;
     return regex.test(hiredDate);
+};
+
+export const validateUsernameAdmin = (username) => {
+    const errors = [];
+    if (username.length < 1) errors.push("Nazwa użytkownika jest za krótka.");
+    if (username.length > 50) errors.push("Nazwa użytkownika jest za długa.");
+    return errors;
+};
+
+export const validateUsernameEmployee = (username) => {
+    const errors = [];
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(username)) errors.push("Nieprawidłowy format adresu email.");
+    return errors;
 };
