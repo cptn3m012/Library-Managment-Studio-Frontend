@@ -1,12 +1,14 @@
 import React from 'react';
+import { HiHome } from 'react-icons/hi';
 
 const Breadcrumb = ({ links }) => {
     return (
         <div className='mb-4'>
             <nav className="flex" aria-label="Breadcrumb">
-                <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+            <HiHome />
+                <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse" style={{ marginLeft: '-0.3rem' }}>
                     {links.map((link, index) => (
-                        <li key={index} className="inline-flex items-center">
+                        <li key={index}  className={`inline-flex items-center ${index === 0 ? 'ms-1' : 'ms-3'}`}>
                             {index > 0 && (
                                 <svg className="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
                                     <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 9 4-4-4-4" />
