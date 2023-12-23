@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import axios from 'axios';
 import EmployeeForm from './EmployeeForm';
 import LoginDataForm from './LoginDataForm';
@@ -28,16 +28,16 @@ function AddEmployeeContainer() {
         arePasswordsMatching
     } = usePasswordValidation();
 
-    const initialFormData = {
+    const initialFormData = useMemo(() => ({
         first_name: '',
         last_name: '',
         pesel: '',
         phone_number: '',
         email: '',
         hired_date: today
-    };
+    }), [today]);
 
-    const { formData, formErrors, handleInputChange, setFormErrors } = useFormValidation(initialFormData);
+    const { formData, formErrors, handleInputChange, setFormData, setFormErrors } = useFormValidation(initialFormData);
 
     const handleCustomInputChange = useCallback((e) => {
         const { name, value } = e.target;
@@ -58,8 +58,11 @@ function AddEmployeeContainer() {
             confirmPassword: passwordMatchError
         };
 
+        setFormErrors(updatedErrors);
+
+        // Sprawdź, czy są jakieś błędy w formularzu
         if (Object.values(updatedErrors).some(error => error)) {
-            setFormErrors(updatedErrors);
+            errorNotify('Masz błędy w formularzu i należy je poprawić');
             return;
         }
 
@@ -76,19 +79,19 @@ function AddEmployeeContainer() {
             }
         }).then(response => {
             successNotify('Pracownik dodany pomyślnie');
+            setFormData(initialFormData);
         }).catch(error => {
             // Obsługa błędu
             errorNotify('Błąd podczad dodawania pracownika');
-            console.error('Błąd podczas dodawania pracownika:', error.response ? error.response.data : error);
         });
-    }, [formData, password, formErrors, arePasswordsMatching, setFormErrors]);
+    }, [formData, password, formErrors, arePasswordsMatching, setFormData, setFormErrors, initialFormData]);
 
     return (
         <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 dark:bg-gray-800">
             <h1 className="text-2xl font-normal text-gray-900 mb-2 dark:text-white">Dodaj pracownika</h1>
             <Breadcrumb
                 links={[
-                    { label: 'Home', path: '/' },
+                    { label: 'Home', path: '/admin' },
                     { label: 'Lista pracowników', path: '/admin/employee-list' },
                     { label: 'Dodaj pracownika', path: '/admin/add-employee' }
                 ]}

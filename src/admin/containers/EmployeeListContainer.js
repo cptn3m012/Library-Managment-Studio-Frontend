@@ -25,7 +25,11 @@ function EmployeeListContainer() {
 
     const filteredEmployees = employees.filter(employee => {
         const fullName = `${employee.first_name} ${employee.last_name}`.toLowerCase();
-        return fullName.includes(searchTerm);
+        const pesel = employee.pesel ? employee.pesel.toString().toLowerCase() : '';
+        const email = employee.email ? employee.email.toLowerCase() : '';
+        const phone = employee.phone_number ? employee.phone_number.toString().toLowerCase() : '';
+    
+        return fullName.includes(searchTerm) || pesel.includes(searchTerm) || email.includes(searchTerm) || phone.includes(searchTerm);
     });
 
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -129,7 +133,7 @@ function EmployeeListContainer() {
             <h1 className="text-2xl font-normal text-gray-900 mb-2 dark:text-white">Lista pracowników</h1>
             <Breadcrumb
                 links={[
-                    { label: 'Home', path: '/' },
+                    { label: 'Home', path: '/admin' },
                     { label: 'Lista pracowników', path: '/admin/employee-list' }
                 ]}
             />
