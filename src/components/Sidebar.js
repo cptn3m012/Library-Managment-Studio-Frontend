@@ -102,6 +102,7 @@ function Sidebar({ role }) {
                     <SidebarLink key={link.key} link={link} isOpen={openSubMenus} toggleSubMenu={toggleSubMenu} />
                 ))}
             </div>
+            <hr className="my-1 h-0.5 bg-gray-400 border-0" />
             <div>
                 {sidebarBottomLinks.map((link) => (
                     <SidebarLink key={link.key} link={link} />
