@@ -94,7 +94,6 @@ function Sidebar({ role }) {
     return (
         <div className='bg-neutral-900 w-60 p-3 flex flex-col text-white'>
             <div className='flex items-center gap-2 px-1 py-3'>
-                {/* <img src={logo} className="w-10" alt="Logo"/> */}
                 <span className="text-xl font-semibold text-white">Library Management</span>
             </div>
             <div className="py-8 flex flex-1 flex-col gap-0.5">

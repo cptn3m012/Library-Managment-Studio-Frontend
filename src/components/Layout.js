@@ -16,7 +16,7 @@ function Layout({ role }) {
             {isSidebarOpen && <Sidebar role={role} />}
             <div className='flex flex-col w-full'>
                 <Header toggleSidebar={toggleSidebar} />
-                <main className='bg-gray-50 flex-1 overflow-y-auto p-4'>
+                <main className='bg-gray-50 flex-1 overflow-y-auto p-4 dark:bg-gray-900'>
                     <Outlet />
                 </main>
                 <Footer />
