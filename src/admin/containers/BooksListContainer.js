@@ -91,6 +91,18 @@ function BooksListContainer() {
         setIsLoanModalOpen(false);
     };
 
+    const breadcrumbLinks = isAdmin ? [
+        { label: 'Home', path: '/admin' },
+        { label: 'Lista książek', path: '/admin/books-list' },
+    ] : isStaff ? [
+        { label: 'Home', path: '/staff' },
+        { label: 'Lista książek', path: '/staff/books-list' },
+    ] : [
+        { label: 'Home', path: '/' },
+        { label: 'Lista książek', path: '/' }, // Domyślna ścieżka, jeśli użytkownik nie jest ani adminem ani pracownikiem
+    ];
+
+
     const handleFormSubmit = async (updatedBookData) => {
         try {
             const bookId = editingBook.id.split('-')[0];
@@ -193,12 +205,7 @@ function BooksListContainer() {
     return (
         <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 dark:bg-gray-800">
             <h1 className="text-2xl font-normal text-gray-900 mb-2 dark:text-white">Lista książek</h1>
-            <Breadcrumb
-                links={[
-                    { label: 'Home', path: '/' },
-                    { label: 'Lista książek', path: '/admin/books-list' }
-                ]}
-            />
+            <Breadcrumb links={breadcrumbLinks} />
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg border border-gray-300">
                 <div className="flex items-center justify-between flex-column md:flex-row flex-wrap space-y-4 md:space-y-0 py-4 bg-white dark:bg-gray-900 px-4 border border-gray-300">
                     <SearchBar onSearch={handleSearch} placeholder={'Wyszukaj książkę'} />
@@ -212,10 +219,10 @@ function BooksListContainer() {
                     )}
                     {isStaff && !isAdmin && (
                         <button
-                            onClick={() => navigate('/staff/borrow-book')} // Załóżmy, że to jest ścieżka do strony wypożyczeń
+                            onClick={() => navigate('/staff/return-book')} 
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 mt-4 rounded"
                         >
-                            Wypożycz książkę
+                            Lista wypożyczeń
                         </button>
                     )}
                 </div>

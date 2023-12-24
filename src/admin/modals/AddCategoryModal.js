@@ -2,19 +2,27 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import ConnectionUrl from '../../utils/ConnectionUrl';
 import { errorNotify, successNotify } from '../../utils/Notifications';
+import { validateCategoryName } from '../../utils/validation';
 
 function AddCategoryModal({ isOpen, onClose, onCategoryAdd }) {
     const [newCategory, setNewCategory] = useState('');
+    const [validationError, setValidationError] = useState('');
 
     const overlayStyle = `absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0'}`;
 
     const handleInputChange = (e) => {
         setNewCategory(e.target.value);
+
+        if (!validateCategoryName(newCategory)) {
+            setValidationError('Nazwa kategorii jest nieprawidłowa. Musi zawierać co najmniej 3 litery i nie może zawierać cyfr.');
+            return;
+        }
+        setValidationError('');
     };
 
     const handleAddCategory = async () => {
-        if (newCategory.trim() === '') {
-            alert('Nazwa kategorii nie może być pusta.');
+        if (validationError) {
+            errorNotify('Masz błąd w formularzu, należy go poprawić.');
             return;
         }
 
@@ -34,9 +42,9 @@ function AddCategoryModal({ isOpen, onClose, onCategoryAdd }) {
         <div
             className={`fixed inset-0 z-50 flex justify-center items-start ${isOpen ? "pt-10" : "hidden"} overflow-x-hidden overflow-y-auto`}
         >
-        <div className={overlayStyle} aria-hidden="true" onClick={onClose}></div>
+            <div className={overlayStyle} aria-hidden="true" onClick={onClose}></div>
             <div className="relative w-full max-w-md">
-                <form className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
                     <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
                         <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                             Dodaj kategorię
@@ -64,7 +72,7 @@ function AddCategoryModal({ isOpen, onClose, onCategoryAdd }) {
                             <span className="sr-only">Close modal</span>
                         </button>
                     </div>
-                    <div className="p-6 space-y-6">
+                    <div className="p-6 space-y-2">
                         <input
                             type="text"
                             value={newCategory}
@@ -72,24 +80,24 @@ function AddCategoryModal({ isOpen, onClose, onCategoryAdd }) {
                             placeholder="Nowa kategoria"
                             className="border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         />
+                        {validationError && <p className="text-red-500">{validationError}</p>}
                     </div>
-                    <div className="flex items-center p-6 space-x-3 rtl:space-x-reverse border-t border-gray-200 rounded-b dark:border-gray-600">
+                    <div className="flex items-center p-6 space-x-3 rtl:space-x-reverse border-t border-gray-200 rounded-b dark:border-gray-600 justify-end">
                         <button
                             type="button"
-                            onClick={onClose}
-                            className="text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
-                        >
-                            Anuluj
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleAddCategory}
+                            onClick={handleAddCategory} 
                             className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                         >
-                            Dodaj
+                            Zapisz zmiany
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="text-white bg-gray-800 hover:bg-black focus:ring-4 focus:outline-none focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-800 dark:hover:bg-black dark:focus:ring-gray-700 dark:text-gray-300"
+                        >
+                            Zamknij
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     );

@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import ConnectionUrl from '../../utils/ConnectionUrl';
 import { errorNotify, successNotify } from '../../utils/Notifications';
+import { HiOutlineQuestionMarkCircle } from "react-icons/hi";
 
 function DeleteCategoryModal({ isOpen, onClose, categoryId, onCategoryDelete }) {
     const [isDeleting, setIsDeleting] = useState(false);
-
-    const overlayStyle = `absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0'}`;
 
     const handleDeleteCategory = async () => {
         setIsDeleting(true);
@@ -24,57 +23,42 @@ function DeleteCategoryModal({ isOpen, onClose, categoryId, onCategoryDelete }) 
     };
 
     return (
-        <div
-            className={`fixed inset-0 z-50 flex justify-center items-start ${isOpen ? "pt-10" : "hidden"} overflow-x-hidden overflow-y-auto`}
-        >
-            <div className={overlayStyle} aria-hidden="true" onClick={onClose}></div>
-            <div className="relative w-full max-w-md">
-                <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                    <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                            Usuń kategorię
-                        </h3>
-                        <button
-                            type="button"
-                            className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                            onClick={onClose}
-                        >
-                            <svg
-                                className="w-3 h-3"
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 14 14"
-                            >
-                                <path
-                                    stroke="currentColor"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                                />
-                            </svg>
-                            <span className="sr-only">Close modal</span>
-                        </button>
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex items-center justify-top min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+                    <div className="absolute inset-0 bg-gray-500 opacity-75" />
+                </div>
+                <div className="inline-block align-top bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
+                    <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div className="sm:flex sm:items-start">
+                            <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-300 sm:mx-0 sm:h-10 sm:w-10">
+                                <HiOutlineQuestionMarkCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
+                            </div>
+                            <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                                    Potwierdzenie usunięcia
+                                </h3>
+                                <div className="mt-2">
+                                    <p className="text-sm text-gray-500 dark:text-gray-200">
+                                        Czy na pewno chcesz usunąć tę kategorię? Ta operacja jest nieodwracalna.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="p-6 space-y-6">
-                        <p>Czy na pewno chcesz usunąć tę kategorię? Ta akcja jest nieodwracalna.</p>
-                    </div>
-                    <div className="flex items-center p-6 space-x-3 rtl:space-x-reverse border-t border-gray-200 rounded-b dark:border-gray-600">
+                    <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:justify-end">
                         <button
                             type="button"
-                            onClick={onClose}
-                            className="text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
-                        >
-                            Anuluj
-                        </button>
-                        <button
-                            type="button"
+                            className="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 dark:bg-red-700 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm"
                             onClick={handleDeleteCategory}
-                            disabled={isDeleting}
-                            className={`text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800 ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
+                            disabled={isDeleting}>
                             {isDeleting ? 'Usuwanie...' : 'Usuń'}
+                        </button>
+                        <button
+                            type="button"
+                            className="ml-2 inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
+                            onClick={onClose}>
+                            Anuluj
                         </button>
                     </div>
                 </div>

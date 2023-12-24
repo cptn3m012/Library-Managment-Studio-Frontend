@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ConnectionUrl from '../../utils/ConnectionUrl';
+import useFormValidation from '../hooks/useFormValidation';
+import { errorNotify } from '../../utils/Notifications';
+import { validateAuthor } from '../../utils/validation';
 
 function EditBookModal({ isOpen, onClose, bookData, handleFormSubmit }) {
-    const [formData, setFormData] = useState({
-        title: '',
-        authors: [''],
-        isbn: '',
-        category: '',
-        publication_year: '',
-        publisher: ''
-    });
+    const initialFormData = {
+        // początkowe wartości dla pól formularza, dostosowane do struktury bookData
+        title: bookData.title || '',
+        authors: bookData.authors || [''],
+        isbn: bookData.isbn || '',
+        category: bookData.category || '',
+        publication_year: bookData.publication_year || '',
+        publisher: bookData.publisher || ''
+    };
 
     const [categories, setCategories] = useState([]);
+    const { formData, formErrors, handleInputChange, setFormData, setFormErrors } = useFormValidation(initialFormData);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -43,12 +48,7 @@ function EditBookModal({ isOpen, onClose, bookData, handleFormSubmit }) {
                 publisher: bookData.publisher
             });
         }
-    }, [isOpen, bookData]);
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
+    }, [isOpen, bookData, setFormData]);
 
     const handleAuthorChange = (index, value) => {
         const updatedAuthors = formData.authors.map((author, i) => {
@@ -56,16 +56,32 @@ function EditBookModal({ isOpen, onClose, bookData, handleFormSubmit }) {
             return author;
         });
         setFormData({ ...formData, authors: updatedAuthors });
+        setFormErrors({ ...formErrors, [`author-${index}`]: validateAuthor(value) });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        handleFormSubmit({
-            ...formData, authors: formData.authors.map(author => {
+    
+        // Sprawdzenie, czy istnieją jakiekolwiek błędy w formularzu
+        const hasErrors = Object.values(formErrors).some(error => error);
+    
+        if (hasErrors) {
+            // Wyświetlenie powiadomienia o błędach
+            errorNotify('Formularz zawiera błędy. Proszę je poprawić.');
+            return;
+        }
+    
+        // Przygotowanie danych do przesłania
+        const preparedData = {
+            ...formData,
+            authors: formData.authors.map(author => {
                 const [firstName, lastName] = author.split(' ');
                 return { firstName, lastName };
             })
-        });
+        };
+    
+        // Wywołanie funkcji obsługi przesyłania formularza
+        handleFormSubmit(preparedData);
         onClose();
     };
 
@@ -112,24 +128,28 @@ function EditBookModal({ isOpen, onClose, bookData, handleFormSubmit }) {
                             <div>
                                 <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tytuł książki:</label>
                                 <input type="text" name="title" id="title" value={formData.title} onChange={handleInputChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" required />
+                                {formErrors.title && <p className="text-red-500">{formErrors.title}</p>}
                             </div>
 
                             {/* Numer ISBN */}
                             <div>
                                 <label htmlFor="isbn" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Numer ISBN:</label>
                                 <input type="text" name="isbn" id="isbn" value={formData.isbn} onChange={handleInputChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" required />
+                                {formErrors.isbn && <p className="text-red-500">{formErrors.isbn}</p>}
                             </div>
 
                             {/* Rok wydania */}
                             <div>
                                 <label htmlFor="publication_year" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Rok wydania:</label>
                                 <input type="number" id="publication_year" name="publication_year" min="1900" max={new Date().getFullYear()} value={formData.publication_year} onChange={handleInputChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="2023" required />
+                                {formErrors.publication_year && <p className="text-red-500">{formErrors.publication_year}</p>}
                             </div>
 
                             {/* Wydawnictwo */}
                             <div>
                                 <label htmlFor="publisher" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Wydawnictwo:</label>
                                 <input type="text" name="publisher" id="publisher" value={formData.publisher} onChange={handleInputChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" required />
+                                {formErrors.publisher && <p className="text-red-500">{formErrors.publisher}</p>}
                             </div>
                         </div>
                         {/* Autorzy */}
@@ -137,6 +157,7 @@ function EditBookModal({ isOpen, onClose, bookData, handleFormSubmit }) {
                             <div key={index} className="flex flex-col mb-4">
                                 <label htmlFor={`author-${index}`} className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Autor:</label>
                                 <input type="text" name={`author-${index}`} id={`author-${index}`} value={author} onChange={(e) => handleAuthorChange(index, e.target.value)} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" required />
+                                {formErrors[`author-${index}`] && <p className="text-red-500">{formErrors[`author-${index}`]}</p>}
                             </div>
                         ))}
                         {/* Kategoria książki */}
@@ -158,12 +179,18 @@ function EditBookModal({ isOpen, onClose, bookData, handleFormSubmit }) {
                             </select>
                         </div>
                     </div>
-                    <div className="flex items-center p-6 space-x-3 rtl:space-x-reverse border-t border-gray-200 rounded-b dark:border-gray-600">
+                    <div className="flex items-center p-6 space-x-3 rtl:space-x-reverse border-t border-gray-200 rounded-b dark:border-gray-600 justify-end">
                         <button
                             type="submit"
                             className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                         >
-                            Zapisz
+                            Zapisz zmiany
+                        </button>
+                        <button
+                            onClick={onClose} 
+                            className="text-white bg-gray-800 hover:bg-black focus:ring-4 focus:outline-none focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-800 dark:hover:bg-black dark:focus:ring-gray-700"
+                        >
+                            Zamknij
                         </button>
                     </div>
                 </form>
