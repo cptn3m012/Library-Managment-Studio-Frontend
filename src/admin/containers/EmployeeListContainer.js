@@ -87,8 +87,12 @@ function EmployeeListContainer() {
             console.log(response);
             successNotify('Pomyślnie edytowano dane użytkownika');
         } catch (error) {
-            errorNotify('Wystąpił błąd podczas aktualizacji danych pracownika');
-            console.error('Błąd podczas aktualizacji danych pracownika:', error);
+            // Sprawdzenie, czy błąd pochodzi z odpowiedzi serwera
+            if (error.response && error.response.data && error.response.data.error) {
+                errorNotify(error.response.data.error);
+            } else {
+                errorNotify('Wystąpił błąd podczas aktualizacji danych pracownika');
+            }
         }
     };
 
