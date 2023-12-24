@@ -1,12 +1,12 @@
-// Walidacja imienia pracownika (dopuszcza tylko litery i spacje, minimalna długość 2 znaki)
+// Walidacja imienia pracownika
 export const validateFirstName = (first_name) => {
-    const regex = /^[A-Za-z]{2,}(\s[A-Za-z]{2,})*$/;
+    const regex = /^[A-Za-ząćęłńóśźż]{2,}(\s[A-Za-ząćęłńóśźż]{2,})*$/;
     return regex.test(first_name);
 };
 
-// Walidacja nazwiska pracownika (podobnie jak imię)
+// Walidacja nazwiska pracownika 
 export const validateLastName = (last_name) => {
-    const regex = /^[A-Za-z]{2,}(\s[A-Za-z]{2,})*$/;
+    const regex = /^[A-Za-ząćęłńóśźż]{2,}(\s[A-Za-ząćęłńóśźż]{2,})*$/;
     return regex.test(last_name);
 };
 
@@ -53,6 +53,7 @@ export const validateHiredDate = (hiredDate) => {
     return regex.test(hiredDate);
 };
 
+// Walidacja loginu admina
 export const validateUsernameAdmin = (username) => {
     const errors = [];
     if (username.length < 1) errors.push("Nazwa użytkownika jest za krótka.");
@@ -60,9 +61,56 @@ export const validateUsernameAdmin = (username) => {
     return errors;
 };
 
+//Walidacja dla maila 
 export const validateUsernameEmployee = (username) => {
     const errors = [];
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(username)) errors.push("Nieprawidłowy format adresu email.");
     return errors;
+};
+
+// Walidacja adresu zamieszkania
+export const validateAddress = (address) => {
+    const regex = /^[A-Za-z0-9ąćęłńóśźż\s,.-/\\]+$/;
+    return regex.test(address);
+};
+
+// Walidacja połączonego kodu pocztowego i miasta
+export const validatePostalCodeAndCity = (postalCodeAndCity) => {
+    const regex = /^\d{2}-\d{3}\s[A-Za-ząćęłńóśźż\s]+$/;
+    return regex.test(postalCodeAndCity);
+};
+
+//Walidacja tytułu książki
+export const validateTitle = (title) => {
+    return title.length > 2; 
+};
+
+//Walidacja numeru ISBN książki
+export const validateISBN = (isbn) => {
+    const regex = /^[0-9-]{10,13}$/; 
+    return regex.test(isbn);
+};
+
+// Walidacja roku wydania (musi być rokiem w przeszłości)
+export const validatePublicationYear = (year) => {
+    const currentYear = new Date().getFullYear();
+    return year > 0 && year <= currentYear;
+};
+
+// Walidacja wydawnictwa (prosta walidacja długości nazwy)
+export const validatePublisher = (publisher) => {
+    return publisher.length > 2;
+};
+
+// Walidacja autora (prosta walidacja długości nazwy)
+export const validateAuthor = (author) => {
+    return author.length > 2 ? '' : 'Nazwa autora jest nieprawidłowa.';
+};
+
+// Funkcja do walidacji nazwy kategorii
+export const validateCategoryName = (name) => {
+    // Przykładowe kryteria: nazwa musi mieć co najmniej 3 znaki i nie może zawierać cyfr
+    const regex = /^[A-Za-ząćęłńóśźż\s]{3,}$/;
+    return regex.test(name);
 };
