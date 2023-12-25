@@ -112,6 +112,8 @@ function App() {
           <Route path="employee-list" element={<EmployeeListContainer />} />
           <Route path="add-book" element={<AddBookContainer />} />
           <Route path="books-list" element={<BooksListContainer />} />
+          <Route path="borrowing-history" element={<LoanHistoryListContainer />} />
+          <Route path="readers-list" element={<ReaderListContainer />} />
         </Route>
         <Route path="/staff" element={<StaffRoute><Layout role="staff" /></StaffRoute>}>
           <Route index element={<StaffDashboard />} />

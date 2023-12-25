@@ -4,14 +4,14 @@ import {
 	HiOutlineDocumentText,
 	HiOutlineQuestionMarkCircle,
     HiOutlineBookOpen,
-	HiOutlineCog
+	HiOutlineUserGroup 
 } from 'react-icons/hi'
 
 export const DASHBOARD_SIDEBAR_LINKS = [
 	{
 		key: 'dashboard',
 		label: 'Dashboard',
-		path: '/admin/dashboard',
+		path: '/admin',
 		icon: <HiOutlineViewGrid />
 	},
 	{
@@ -25,6 +25,12 @@ export const DASHBOARD_SIDEBAR_LINKS = [
 		]
 	},
 	{
+		key: 'readers',
+		label: 'Czytelnicy',
+		path: 'readers-list',
+		icon: <HiOutlineUserGroup />
+	},
+	{
 		key: 'books',
 		label: 'Książki',
 		path: '/books',
@@ -36,25 +42,13 @@ export const DASHBOARD_SIDEBAR_LINKS = [
 	},
 	{
 		key: 'customers',
-		label: 'Raporty',
-		path: '/customers',
-		icon: <HiOutlineDocumentText />,
-        subLinks: [
-			{ label: 'Raport wypożyczeń', path: '/add-book' },
-			{ label: 'Raport przeterminowań', path: '/edit-book' },
-            { label: 'Statystyki pracowników', path: '/edit-book' },
-            { label: 'Analiza zasobów', path: '/edit-book' }
-		]
+		label: 'Raport wypożyczeń',
+		path: 'borrowing-history',
+		icon: <HiOutlineDocumentText />
 	}
 ]
 
 export const DASHBOARD_SIDEBAR_BOTTOM_LINKS = [
-	{
-		key: 'settings',
-		label: 'Ustawienia',
-		path: '/settings',
-		icon: <HiOutlineCog />
-	},
     {
 		key: 'logout',
 		label: 'Wyloguj się',
