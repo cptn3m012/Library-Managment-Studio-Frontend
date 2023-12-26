@@ -124,7 +124,7 @@ function AddBookContainer() {
             <h1 className="text-2xl font-normal text-gray-900 mb-2 dark:text-white">Dodaj książkę</h1>
             <Breadcrumb
                 links={[
-                    { label: 'Home', path: '/' },
+                    { label: 'Home', path: '/admin' },
                     { label: 'Lista książek', path: '/admin/books-list' },
                     { label: 'Dodaj książkę', path: '/admin/add-book' }
                 ]}

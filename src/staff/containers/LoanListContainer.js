@@ -58,19 +58,14 @@ function LoanListContainer() {
 
     const handleReturnConfirm = async () => {
         try {
-            const response = await axios.post(`${ConnectionUrl.connectionUrlString}api/loans/return/${loanToReturn.id}`);
+            await axios.post(`${ConnectionUrl.connectionUrlString}api/loans/return/${loanToReturn.id}`);
             await fetchLoans();           
             closeReturnModal();
             successNotify('Książka zwrócona pomyślnie');
         } catch (error) {
             if (error.response) {
-                // Odpowiedź serwera jest dostępna
-                console.error('Error data:', error.response.data);
-                // Możesz również wyświetlić bardziej szczegółowy komunikat błędu na interfejsie użytkownika
                 errorNotify(`Błąd podczas zwracania książki: ${error.response.data.error}`);
             } else {
-                // Błąd po stronie klienta lub inny problem
-                console.error('Error returning loan: ', error);
                 errorNotify('Błąd podczas zwracania książki');
             }
         }
@@ -80,12 +75,12 @@ function LoanListContainer() {
         try {
             const response = await axios.get(`${ConnectionUrl.connectionUrlString}api/loans`);
             if (response.data) {
-                setLoans(response.data);  // Upewnij się, że ta linia istnieje
+                const activeLoans = response.data.filter(loan => loan.status === 'Wypożyczona');
+                setLoans(activeLoans); 
             } else {
                 console.log('No data received');
             }
         } catch (error) {
-            console.error('Error fetching loans: ', error);
             errorNotify('Wystąpił błąd podczas pobierania listy wypożyczeń');
         }
     };
@@ -96,21 +91,21 @@ function LoanListContainer() {
 
     return (
         <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 dark:bg-gray-800">
-            <h1 className="text-2xl font-normal text-gray-900 mb-2 dark:text-white">Lista czytelników</h1>
+            <h1 className="text-2xl font-normal text-gray-900 mb-2 dark:text-white">Lista wypożyczeń</h1>
             <Breadcrumb
                 links={[
-                    { label: 'Home', path: '/' },
-                    { label: 'Lista czytelników', path: '/staff/readers-list' }
+                    { label: 'Home', path: '/staff' },
+                    { label: 'Lista wypożyczeń', path: '/staff/return-book' }
                 ]}
             />
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg border border-gray-300">
                 <div className="flex items-center justify-between flex-column md:flex-row flex-wrap space-y-4 md:space-y-0 py-4 bg-white dark:bg-gray-900 px-4 border border-gray-300">
                     <SearchBar onSearch={handleSearch} placeholder={'Wyszukaj czytelnika'} />
                     <button
-                        onClick={() => navigate('/staff/add-reader')}
+                        onClick={() => navigate('/staff/borrowing-history')}
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 mt-4 rounded"
                     >
-                        Dodaj czytelnika
+                        Historia wypożyczeń
                     </button>
                 </div>
                 <LoanTable

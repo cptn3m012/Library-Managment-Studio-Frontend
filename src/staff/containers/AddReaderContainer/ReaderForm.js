@@ -85,6 +85,7 @@ function ReaderForm({ formData, handleInputChange, formErrors }) {
                     onChange={handleInputChange}
                     required
                 />
+                {formErrors.address && <p className="text-red-600 text-sm mt-2">{formErrors.address}</p>}
             </div>
 
             {/* Kod pocztowy i miejscowość czytelnika */}
@@ -100,6 +101,7 @@ function ReaderForm({ formData, handleInputChange, formErrors }) {
                     onChange={handleInputChange}
                     required
                 />
+                {formErrors.postalCodeAndCity && <p className="text-red-600 text-sm mt-2">{formErrors.postalCodeAndCity}</p>}
             </div>
 
             {/* Numer PESEL czytelnika */}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { jwtDecode as jwt_decode } from 'jwt-decode';
 import ConnectionUrl from '../../utils/ConnectionUrl';
 import Breadcrumb from '../../components/Breadcrumb';
 import ReaderTable from '../components/Table/ReaderTable';
@@ -23,14 +24,25 @@ function ReaderListContainer() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [readerToDelete, setReaderToDelete] = useState(null);
 
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isStaff, setIsStaff] = useState(false);
+
     const handleSearch = (searchTerm) => {
         setSearchTerm(searchTerm.toLowerCase());
         setCurrentPage(1); // Resetuje numer strony przy wyszukiwaniu
     };
 
     const filteredReaders = readers.filter(reader => {
-        const fullName = `${reader.first_name} ${reader.last_name}`.toLowerCase();
-        return fullName.includes(searchTerm);
+        const searchFields = [
+            `${reader.first_name} ${reader.last_name}`,
+            reader.pesel,
+            reader.address,
+            reader.city,
+            reader.email,
+            reader.phone_number
+        ].join(' ').toLowerCase();
+
+        return searchFields.includes(searchTerm);
     });
 
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -110,7 +122,11 @@ function ReaderListContainer() {
             setIsDeleteModalOpen(false);
             successNotify('Czytelnik usunięty');
         } catch (error) {
-            errorNotify('Błąd podczas usuwania czytelnika');
+            // Sprawdzenie, czy odpowiedź od serwera zawiera konkretny komunikat błędu
+            const errorMessage = error.response && error.response.data && error.response.data.error
+                ? error.response.data.error
+                : 'Błąd podczas usuwania czytelnika';
+            errorNotify(errorMessage);
         }
     };
 
@@ -124,28 +140,43 @@ function ReaderListContainer() {
         }
     };
 
+    // Dostosowanie ścieżek breadcrumb w zależności od roli
+    const breadcrumbLinks = isAdmin ? [
+        { label: 'Home', path: '/admin' },
+        { label: 'Lista czytelników', path: '/admin/readers-list' },
+    ] : isStaff ? [
+        { label: 'Home', path: '/staff' },
+        { label: 'Lista czytelników', path: '/staff/readers-list' },
+    ] : [
+        { label: 'Home', path: '/' },
+        { label: 'Lista czytelników', path: '/' }, // Domyślna ścieżka dla innych użytkowników
+    ];
+
     useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const decoded = jwt_decode(token);
+            setIsAdmin(decoded.sub.role_id === 1);
+            setIsStaff(decoded.sub.role_id === 2);
+        }
         fetchReaders();
     }, []);
 
     return (
         <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 dark:bg-gray-800">
             <h1 className="text-2xl font-normal text-gray-900 mb-2 dark:text-white">Lista czytelników</h1>
-            <Breadcrumb
-                links={[
-                    { label: 'Home', path: '/' },
-                    { label: 'Lista czytelników', path: '/staff/readers-list' }
-                ]}
-            />
+            <Breadcrumb links={breadcrumbLinks} />
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg border border-gray-300">
                 <div className="flex items-center justify-between flex-column md:flex-row flex-wrap space-y-4 md:space-y-0 py-4 bg-white dark:bg-gray-900 px-4 border border-gray-300">
                     <SearchBar onSearch={handleSearch} placeholder={'Wyszukaj czytelnika'} />
-                    <button
-                        onClick={() => navigate('/staff/add-reader')}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 mt-4 rounded"
-                    >
-                        Dodaj czytelnika
-                    </button>
+                    {isStaff && !isAdmin && (
+                        <button
+                            onClick={() => navigate('/staff/add-reader')}
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 mt-4 rounded"
+                        >
+                            Dodaj czytelnika
+                        </button>
+                    )}
                 </div>
                 <ReaderTable
                     readers={currentItems}
