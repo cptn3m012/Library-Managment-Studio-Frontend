@@ -1,25 +1,18 @@
 import {
     HiOutlineUsers,
     HiOutlineBookOpen,
-    HiOutlineSearchCircle,
     HiOutlineClipboardList,
-    HiOutlineCog,
+    HiOutlineViewGrid,
     HiOutlineLogout
 } from 'react-icons/hi';
 
 export const EMPLOYEE_SIDEBAR_LINKS = [
     {
-        key: 'borrowings',
-        label: 'Wypożyczenia',
-        path: '/employee/borrowings',
-        icon: <HiOutlineClipboardList />,
-        subLinks: [
-            { label: 'Wypożycz książkę', path: 'borrow-book' },
-            { label: 'Przyjmij zwrot', path: '/return-book' },
-            { label: 'Rezerwacje', path: '/reservations' },
-            { label: 'Przypomnienia', path: '/reminders' }
-        ]
-    },
+		key: 'dashboard',
+		label: 'Dashboard',
+		path: '/staff',
+		icon: <HiOutlineViewGrid />
+	},
     {
         key: 'readers',
         label: 'Czytelnicy',
@@ -27,39 +20,28 @@ export const EMPLOYEE_SIDEBAR_LINKS = [
         icon: <HiOutlineUsers />,
         subLinks: [
             { label: 'Lista czytelników', path: 'readers-list' },
-            { label: 'Dodaj czytelnika', path: 'add-reader' },
-            { label: 'Historia wypożyczeń', path: '/borrowing-history' }
+            { label: 'Dodaj czytelnika', path: 'add-reader' }
         ]
     },
     {
         key: 'books',
-        label: 'Książki',
-        path: '/employee/books',
+        label: 'Dostępne książki',
+        path: 'books-list',
         icon: <HiOutlineBookOpen />,
-        subLinks: [
-            { label: 'Wyszukaj książki', path: '/search-books' },
-            { label: 'Dostępność książek', path: '/book-availability' }
-        ]
     },
     {
-        key: 'inventory',
-        label: 'Inwentaryzacja',
-        path: '/employee/inventory',
-        icon: <HiOutlineSearchCircle />,
+        key: 'borrowings',
+        label: 'Wypożyczenia',
+        path: 'return-book', 
+        icon: <HiOutlineClipboardList />,
         subLinks: [
-            { label: 'Lista książek', path: 'books-list' },
-            { label: 'Stan książek', path: '/book-status' }
+            { label: 'Lista wypożyczeń', path: 'return-book' },
+            { label: 'Historia wypożyczeń', path: 'borrowing-history' }
         ]
-    }
+    },
 ];
 
 export const EMPLOYEE_SIDEBAR_BOTTOM_LINKS = [
-    {
-        key: 'settings',
-        label: 'Ustawienia',
-        path: '/settings',
-        icon: <HiOutlineCog />
-    },
     {
         key: 'logout',
         label: 'Wyloguj się',
